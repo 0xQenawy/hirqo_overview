@@ -309,9 +309,35 @@
         /* Mobile responsive adjustments */
         @media (max-width: 640px) {
             .chart-container {
-                height: 240px !important;
-                max-height: 260px !important;
+                height: 220px !important;
+                max-height: 240px !important;
             }
+
+            /* Prevent horizontal overflow on mobile */
+            body { overflow-x: hidden; }
+
+            /* Hero metrics smaller on mobile */
+            .hero-metric-val { font-size: 1.5rem !important; }
+
+            /* Make pre blocks scroll instead of overflow */
+            pre { white-space: pre-wrap; word-break: break-all; }
+
+            /* Stack footer button full width */
+            .footer-cta-btn { width: 100%; justify-content: center; }
+
+            /* CV table hide less important columns on mobile */
+            .table-col-hide-mobile { display: none !important; }
+
+            /* Stack Step 5 action buttons */
+            .step5-actions { flex-direction: column !important; gap: 8px !important; }
+            .step5-actions .custom-btn { width: 100%; justify-content: center; }
+        }
+
+        @media (max-width: 768px) {
+            /* IDE sidebar stacks below code on mobile */
+            .ide-grid { display: flex !important; flex-direction: column !important; }
+            .ide-grid > div { border-right: none !important; border-bottom: 1px solid #1e293b; }
+            .ide-grid > div:last-child { border-bottom: none !important; }
         }
     </style>
 </head>
@@ -398,7 +424,7 @@
                 </div>
 
                 <!-- Main Title -->
-                <h1 class="text-2xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight leading-[1.2] sm:leading-[1.15] text-white">
+                <h1 class="text-2xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight leading-[1.25] sm:leading-[1.15] text-white">
                     Know who can <span class="text-brand-400">actually</span> do the job before you hire them.
                 </h1>
 
@@ -409,35 +435,35 @@
 
                 <!-- Actions -->
                 <div class="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 pt-2">
-                    <a href="#hr-workflow" class="custom-btn hero-btn-primary custom-btn-md justify-center text-center">
+                    <a href="#hr-workflow" class="custom-btn hero-btn-primary custom-btn-md justify-center text-center w-full sm:w-auto">
                         <span>Explore Platform Workflow</span>
                         <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
                             <line x1="12" y1="5" x2="12" y2="19"></line>
                             <polyline points="19 12 12 19 5 12"></polyline>
                         </svg>
                     </a>
-                    <button onclick="openModal()" class="custom-btn hero-btn-secondary custom-btn-md justify-center text-center">
+                    <button onclick="openModal()" class="custom-btn hero-btn-secondary custom-btn-md justify-center text-center w-full sm:w-auto">
                         <span>Schedule Live Walkthrough</span>
                     </button>
                 </div>
 
                 <!-- Key Impact Metrics Banner -->
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-6 pt-8 border-t border-neutral-800/90 mt-8">
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 pt-6 sm:pt-8 border-t border-neutral-800/90 mt-6 sm:mt-8">
                     <div>
-                        <div class="text-3xl font-extrabold text-brand-400">85%</div>
-                        <div class="text-xs text-neutral-400 font-medium mt-1">Faster CV Screening</div>
+                        <div class="text-2xl sm:text-3xl font-extrabold text-brand-400">85%</div>
+                        <div class="text-[11px] sm:text-xs text-neutral-400 font-medium mt-1">Faster CV Screening</div>
                     </div>
                     <div>
-                        <div class="text-3xl font-extrabold text-emerald-400">100%</div>
-                        <div class="text-xs text-neutral-400 font-medium mt-1">Real Codebase Work</div>
+                        <div class="text-2xl sm:text-3xl font-extrabold text-emerald-400">100%</div>
+                        <div class="text-[11px] sm:text-xs text-neutral-400 font-medium mt-1">Real Codebase Work</div>
                     </div>
                     <div>
-                        <div class="text-3xl font-extrabold text-sky-400">360°</div>
-                        <div class="text-xs text-neutral-400 font-medium mt-1">AI Prompt Insights</div>
+                        <div class="text-2xl sm:text-3xl font-extrabold text-sky-400">360°</div>
+                        <div class="text-[11px] sm:text-xs text-neutral-400 font-medium mt-1">AI Prompt Insights</div>
                     </div>
                     <div>
-                        <div class="text-3xl font-extrabold text-amber-400">Zero</div>
-                        <div class="text-xs text-neutral-400 font-medium mt-1">Opaque Guesswork</div>
+                        <div class="text-2xl sm:text-3xl font-extrabold text-amber-400">Zero</div>
+                        <div class="text-[11px] sm:text-xs text-neutral-400 font-medium mt-1">Opaque Guesswork</div>
                     </div>
                 </div>
             </div>
@@ -595,7 +621,7 @@
             </div>
 
             <!-- Visual Showcase IDE Container -->
-            <div class="bg-[#081328] rounded-3xl overflow-hidden shadow-2xl border border-neutral-800 text-neutral-300 grid lg:grid-cols-12">
+            <div class="bg-[#081328] rounded-3xl overflow-hidden shadow-2xl border border-neutral-800 text-neutral-300 ide-grid grid lg:grid-cols-12">
                 <!-- Top Window Header -->
                 <div class="lg:col-span-12 bg-[#060e1e] px-3 sm:px-4 py-2.5 sm:py-3 border-b border-neutral-800 flex flex-wrap items-center justify-between gap-2 text-xs">
                     <div class="flex items-center space-x-2 min-w-0">
@@ -611,7 +637,7 @@
                 </div>
 
                 <!-- Left Sidebar: Project File Tree & Task Requirements -->
-                <div class="lg:col-span-3 p-5 border-b lg:border-b-0 lg:border-r border-neutral-800 space-y-5 bg-[#071124]">
+                <div class="lg:col-span-3 p-4 sm:p-5 border-b lg:border-b-0 lg:border-r border-neutral-800 space-y-4 sm:space-y-5 bg-[#071124]">
                     <div>
                         <span class="text-[11px] font-bold text-brand-400 uppercase tracking-wider block mb-2">Project Explorer</span>
                         <div class="space-y-1 text-xs font-mono text-neutral-400 bg-neutral-900/60 p-3 rounded-xl border border-neutral-800">
@@ -675,7 +701,7 @@
                 </div>
 
                 <!-- Middle Panel: Code Editor Preview -->
-                <div class="lg:col-span-5 p-5 border-b lg:border-b-0 lg:border-r border-neutral-800 flex flex-col justify-between bg-[#081328]">
+                <div class="lg:col-span-5 p-4 sm:p-5 border-b lg:border-b-0 lg:border-r border-neutral-800 flex flex-col justify-between bg-[#081328]">
                     <div class="space-y-3">
                         <div class="flex items-center justify-between border-b border-neutral-800 pb-2">
                             <span class="text-xs font-mono text-neutral-300 flex items-center gap-2">
@@ -716,7 +742,7 @@
                 </div>
 
                 <!-- Right Sidebar: Guided AI Assistant & Insights -->
-                <div class="lg:col-span-4 p-5 space-y-4 bg-[#071124] flex flex-col justify-between">
+                <div class="lg:col-span-4 p-4 sm:p-5 space-y-4 bg-[#071124] flex flex-col justify-between">
                     <div class="space-y-3">
                         <div class="flex items-center justify-between border-b border-neutral-800 pb-2">
                             <div class="flex items-center space-x-2">
@@ -836,11 +862,11 @@
                 </p>
             </div>
 
-            <div class="grid md:grid-cols-12 gap-8 items-center">
+            <div class="grid md:grid-cols-12 gap-6 sm:gap-8 items-center">
                 <!-- Sliders Control Panel -->
-                <div class="md:col-span-5 space-y-6 bg-neutral-50 p-6 rounded-2xl border border-neutral-200">
+                <div class="md:col-span-5 space-y-5 sm:space-y-6 bg-neutral-50 p-4 sm:p-6 rounded-2xl border border-neutral-200">
                     <div class="space-y-2">
-                        <div class="flex justify-between text-sm font-semibold">
+                        <div class="flex justify-between text-xs sm:text-sm font-semibold gap-2 flex-wrap">
                             <label for="candidates-slider" class="text-neutral-700">Monthly Technical Applicants</label>
                             <span id="candidates-val" class="text-brand-600 font-bold">50</span>
                         </div>
@@ -848,7 +874,7 @@
                     </div>
 
                     <div class="space-y-2">
-                        <div class="flex justify-between text-sm font-semibold">
+                        <div class="flex justify-between text-xs sm:text-sm font-semibold gap-2 flex-wrap">
                             <label for="hours-slider" class="text-neutral-700">Engineering Hours per Candidate</label>
                             <span id="hours-val" class="text-brand-600 font-bold">4.0 hrs</span>
                         </div>
@@ -856,7 +882,7 @@
                     </div>
 
                     <div class="space-y-2">
-                        <div class="flex justify-between text-sm font-semibold">
+                        <div class="flex justify-between text-xs sm:text-sm font-semibold gap-2 flex-wrap">
                             <label for="rate-slider" class="text-neutral-700">Avg Hourly Rate ($ / hr)</label>
                             <span id="rate-val" class="text-brand-600 font-bold">$45</span>
                         </div>
@@ -984,17 +1010,17 @@
         </section>
 
         <!-- FOOTER & CTA SECTION -->
-        <footer class="bg-[#081328] text-neutral-400 rounded-3xl p-8 sm:p-12 lg:p-16 text-center space-y-6 border border-neutral-800">
+        <footer class="bg-[#081328] text-neutral-400 rounded-3xl p-6 sm:p-12 lg:p-16 text-center space-y-6 border border-neutral-800">
             <div class="max-w-2xl mx-auto space-y-3">
-                <h2 class="text-2xl sm:text-4xl font-extrabold text-white">Ready to modernize your technical hiring?</h2>
+                <h2 class="text-xl sm:text-4xl font-extrabold text-white">Ready to modernize your technical hiring?</h2>
                 <p class="text-sm text-neutral-400 leading-relaxed">
                     We welcome the opportunity to share a personalized live demonstration of HirQo and discuss how it integrates with your tech hiring across Egypt and the GCC.
                 </p>
             </div>
-            <div class="pt-2">
-                <button onclick="openModal()" class="custom-btn custom-btn-primary custom-btn-lg">
+            <div class="pt-2 flex justify-center px-4">
+                <button onclick="openModal()" class="custom-btn custom-btn-primary custom-btn-lg w-full sm:w-auto justify-center">
                     <span>Schedule a Live Platform Walkthrough</span>
-                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                    <svg class="w-4 h-4 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
                 </button>
             </div>
             <div class="text-xs text-neutral-500 pt-8 border-t border-neutral-800/80">
@@ -1385,8 +1411,8 @@
                                 <thead class="bg-neutral-50 text-neutral-500 uppercase font-semibold border-b border-neutral-200">
                                     <tr>
                                         <th class="p-3.5">Candidate Name</th>
-                                        <th class="p-3.5">Primary Tech Stack</th>
-                                        <th class="p-3.5">Experience</th>
+                                        <th class="p-3.5 table-col-hide-mobile">Primary Tech Stack</th>
+                                        <th class="p-3.5 table-col-hide-mobile">Experience</th>
                                         <th class="p-3.5">Match Score</th>
                                         <th class="p-3.5">Recommendation</th>
                                     </tr>
@@ -1394,29 +1420,29 @@
                                 <tbody class="divide-y divide-neutral-100 font-medium" id="candidates-table-body">
                                     <tr class="hover:bg-neutral-50/80 cand-row cand-shortlisted">
                                         <td class="p-3.5 text-neutral-900 font-bold">Sara Ali</td>
-                                        <td class="p-3.5">TypeScript, Node.js, PostgreSQL</td>
-                                        <td class="p-3.5">5 Years</td>
+                                        <td class="p-3.5 table-col-hide-mobile">TypeScript, Node.js, PostgreSQL</td>
+                                        <td class="p-3.5 table-col-hide-mobile">5 Years</td>
                                         <td class="p-3.5 text-emerald-600 font-extrabold text-sm">92% Match</td>
                                         <td class="p-3.5"><span class="bg-emerald-100 text-emerald-800 text-[11px] px-2.5 py-0.5 rounded-full font-bold">Shortlisted</span></td>
                                     </tr>
                                     <tr class="hover:bg-neutral-50/80 cand-row cand-shortlisted">
                                         <td class="p-3.5 text-neutral-900 font-bold">Omar Hassan</td>
-                                        <td class="p-3.5">Node.js, Redis, Concurrency</td>
-                                        <td class="p-3.5">4 Years</td>
+                                        <td class="p-3.5 table-col-hide-mobile">Node.js, Redis, Concurrency</td>
+                                        <td class="p-3.5 table-col-hide-mobile">4 Years</td>
                                         <td class="p-3.5 text-brand-600 font-extrabold text-sm">84% Match</td>
                                         <td class="p-3.5"><span class="bg-emerald-100 text-emerald-800 text-[11px] px-2.5 py-0.5 rounded-full font-bold">Shortlisted</span></td>
                                     </tr>
                                     <tr class="hover:bg-neutral-50/80 cand-row cand-shortlisted">
                                         <td class="p-3.5 text-neutral-900 font-bold">Layla Nabil</td>
-                                        <td class="p-3.5">Fullstack JS, Docker, AWS</td>
-                                        <td class="p-3.5">3 Years</td>
+                                        <td class="p-3.5 table-col-hide-mobile">Fullstack JS, Docker, AWS</td>
+                                        <td class="p-3.5 table-col-hide-mobile">3 Years</td>
                                         <td class="p-3.5 text-brand-600 font-extrabold text-sm">78% Match</td>
                                         <td class="p-3.5"><span class="bg-emerald-100 text-emerald-800 text-[11px] px-2.5 py-0.5 rounded-full font-bold">Shortlisted</span></td>
                                     </tr>
                                     <tr class="hover:bg-neutral-50/80 cand-row cand-rejected">
                                         <td class="p-3.5 text-neutral-900 font-bold">Tarek Mahmoud</td>
-                                        <td class="p-3.5">PHP, WordPress, MySQL</td>
-                                        <td class="p-3.5">2 Years</td>
+                                        <td class="p-3.5 table-col-hide-mobile">PHP, WordPress, MySQL</td>
+                                        <td class="p-3.5 table-col-hide-mobile">2 Years</td>
                                         <td class="p-3.5 text-rose-500 font-extrabold text-sm">42% Match</td>
                                         <td class="p-3.5"><span class="bg-rose-100 text-rose-800 text-[11px] px-2.5 py-0.5 rounded-full font-bold">Below Threshold</span></td>
                                     </tr>
@@ -1533,7 +1559,7 @@
                                 <h3 class="font-bold text-neutral-900 text-lg">Step 5: One-Click Hiring Decision & Automated Communications</h3>
                                 <p class="text-xs text-neutral-500">Record final decisions and automatically draft personalized feedback emails tailored to session results.</p>
                             </div>
-                            <div class="space-x-2">
+                            <div class="flex flex-wrap step5-actions gap-2 sm:space-x-2">
                                 <button onclick="setCandidateDecision('accepted')" class="custom-btn custom-btn-sm custom-btn-primary">
                                     <span>Accept & Extend Offer</span>
                                 </button>
