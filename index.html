@@ -86,11 +86,22 @@
             --font-family-mono: 'JetBrains Mono', monospace;
         }
 
+        html {
+            overflow-x: hidden;
+            max-width: 100%;
+            width: 100%;
+            scroll-behavior: smooth;
+        }
+
         body {
             font-family: var(--font-family-primary);
             background-color: var(--color-neutral-50);
             color: var(--color-neutral-900);
             -webkit-font-smoothing: antialiased;
+            overflow-x: hidden;
+            max-width: 100%;
+            width: 100%;
+            position: relative;
         }
 
         /* Pill Buttons matching HirQo Button.css */
@@ -308,25 +319,74 @@
 
         /* Mobile responsive adjustments */
         @media (max-width: 640px) {
+            html, body {
+                overflow-x: hidden !important;
+                max-width: 100vw !important;
+                width: 100% !important;
+            }
+
+            main {
+                max-width: 100% !important;
+                overflow-x: hidden !important;
+            }
+
             .chart-container {
                 height: 220px !important;
                 max-height: 240px !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                overflow: hidden !important;
             }
 
-            /* Prevent horizontal overflow on mobile */
-            body { overflow-x: hidden; }
+            /* Allow all buttons to wrap text on mobile instead of forcing overflow */
+            .custom-btn {
+                white-space: normal !important;
+                text-align: center;
+                line-height: 1.35;
+            }
 
-            /* Allow button text to wrap on very small screens */
-            .custom-btn-lg { white-space: normal !important; text-align: center; line-height: 1.4; padding-top: 12px; padding-bottom: 12px; }
+            .custom-btn-sm {
+                padding: 6px 12px !important;
+                font-size: 12px !important;
+            }
+
+            .custom-btn-md {
+                padding: 10px 18px !important;
+                font-size: 14px !important;
+            }
+
+            .custom-btn-lg {
+                padding: 12px 20px !important;
+                font-size: 14px !important;
+                line-height: 1.35 !important;
+            }
 
             /* Hero badge wrap fix */
-            .glass-badge { white-space: normal; text-align: center; justify-content: center; }
+            .glass-badge {
+                white-space: normal;
+                text-align: center;
+                justify-content: center;
+                max-width: 100%;
+                line-height: 1.3;
+                font-size: 11.5px !important;
+                padding: 5px 12px !important;
+            }
 
-            /* Make pre blocks scroll instead of overflow */
-            pre { white-space: pre-wrap; word-break: break-all; }
+            /* Code blocks wrap safely without overflow */
+            pre {
+                white-space: pre-wrap !important;
+                word-break: break-word !important;
+                max-width: 100% !important;
+                overflow-x: auto !important;
+            }
 
             /* CV table hide less important columns on mobile */
             .table-col-hide-mobile { display: none !important; }
+
+            /* CV table cells compact on mobile */
+            .cv-table th, .cv-table td {
+                padding: 8px 10px !important;
+            }
 
             /* Stack Step 5 action buttons */
             .step5-actions { flex-direction: column !important; gap: 8px !important; }
@@ -338,15 +398,40 @@
 
         @media (max-width: 768px) {
             /* IDE sidebar stacks below code on mobile */
-            .ide-grid { display: flex !important; flex-direction: column !important; }
-            .ide-grid > div { border-right: none !important; border-bottom: 1px solid #1e293b; }
-            .ide-grid > div:last-child { border-bottom: none !important; }
+            .ide-grid {
+                display: flex !important;
+                flex-direction: column !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                overflow: hidden !important;
+            }
+            .ide-grid > div {
+                border-right: none !important;
+                border-bottom: 1px solid #1e293b;
+                min-width: 0 !important;
+                max-width: 100% !important;
+                width: 100% !important;
+                box-sizing: border-box !important;
+            }
+            .ide-grid > div:last-child {
+                border-bottom: none !important;
+            }
         }
 
         /* Stakeholder card ul centering on mobile */
         @media (max-width: 640px) {
-            .persona-card-ul { text-align: left; }
-            .persona-card-ul li { justify-content: flex-start; }
+            .persona-card-ul {
+                text-align: left;
+                display: flex;
+                flex-direction: column;
+                align-items: flex-start;
+                width: 100%;
+            }
+            .persona-card-ul li {
+                justify-content: flex-start;
+                text-align: left;
+                width: 100%;
+            }
         }
     </style>
 </head>
@@ -354,7 +439,7 @@
 
     <!-- NAVIGATION HEADER (Frosted Glass & Official Logo) -->
     <header class="sticky top-0 z-50 glass-header">
-        <div class="w-full px-3.5 sm:px-8 lg:px-12 h-16 flex items-center justify-between">
+        <div class="w-full px-4 sm:px-8 lg:px-12 h-16 flex items-center justify-between">
             <!-- Brand Logo with Real Asset (Pushed Left) -->
             <div class="flex items-center space-x-2 sm:space-x-3">
                 <a href="#" class="flex items-center py-1 group" aria-label="HirQo Platform">
@@ -415,18 +500,18 @@
     </header>
 
     <!-- MAIN CONTENT -->
-    <main class="max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-12 sm:space-y-16 lg:space-y-20">
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-12 sm:space-y-16 lg:space-y-20 overflow-hidden sm:overflow-visible">
 
         <!-- HERO SECTION -->
-        <section class="bg-gradient-to-br from-[#081328] via-[#0f1d3a] to-[#081328] text-white rounded-3xl p-6 sm:p-12 lg:p-16 shadow-2xl relative overflow-hidden border border-neutral-800">
+        <section class="bg-gradient-to-br from-[#081328] via-[#0f1d3a] to-[#081328] text-white rounded-3xl p-6 sm:p-12 lg:p-16 shadow-2xl relative overflow-hidden border border-neutral-800" style="isolation: isolate; contain: paint;">
             <!-- Subtle Background Accents -->
-            <div class="absolute -right-24 -top-24 w-96 h-96 bg-brand-600/15 rounded-full blur-3xl pointer-events-none"></div>
-            <div class="absolute -left-20 -bottom-20 w-80 h-80 bg-brand-500/10 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="absolute -right-10 sm:-right-24 -top-10 sm:-top-24 w-72 sm:w-96 h-72 sm:h-96 bg-brand-600/15 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="absolute -left-10 sm:-left-20 -bottom-10 sm:-bottom-20 w-72 sm:w-80 h-72 sm:h-80 bg-brand-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
-            <div class="max-w-3xl space-y-5 sm:space-y-6 relative z-10">
+            <div class="max-w-3xl space-y-5 sm:space-y-6 relative z-10 flex flex-col items-center sm:items-start text-center sm:text-left">
                 <!-- Frosted Badge -->
-                <div class="glass-badge text-xs">
-                    <svg class="w-4 h-4 text-brand-300 shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                <div class="glass-badge text-[11px] sm:text-xs px-3 py-1.5 sm:px-4 sm:py-2">
+                    <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-brand-300 shrink-0" viewBox="0 0 24 24" fill="currentColor">
                         <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
                     </svg>
                     <span>Purpose-Built for Technical Hiring in Egypt & GCC</span>
@@ -443,7 +528,7 @@
                 </p>
 
                 <!-- Actions -->
-                <div class="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 pt-2">
+                <div class="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 pt-2 w-full sm:w-auto">
                     <a href="#hr-workflow" class="custom-btn hero-btn-primary custom-btn-md justify-center text-center w-full sm:w-auto">
                         <span>Explore Platform Workflow</span>
                         <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
@@ -457,7 +542,7 @@
                 </div>
 
                 <!-- Key Impact Metrics Banner -->
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 pt-6 sm:pt-8 border-t border-neutral-800/90 mt-6 sm:mt-8">
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 pt-6 sm:pt-8 border-t border-neutral-800/90 mt-6 sm:mt-8 w-full text-center sm:text-left">
                     <div>
                         <div class="text-2xl sm:text-3xl font-extrabold text-brand-400">85%</div>
                         <div class="text-[11px] sm:text-xs text-neutral-400 font-medium mt-1">Faster CV Screening</div>
@@ -491,12 +576,12 @@
 
             <!-- Interactive Dilemma Switcher -->
             <div class="bg-white p-5 sm:p-8 rounded-3xl border border-neutral-200 shadow-sm space-y-6 sm:space-y-8">
-                <div class="flex justify-center max-w-full overflow-x-auto">
-                    <div class="bg-neutral-100 p-1.5 rounded-full inline-flex space-x-1 max-w-full">
-                        <button id="btn-traditional" onclick="setDilemmaMode('traditional')" class="custom-btn custom-btn-sm rounded-full bg-white text-neutral-900 shadow-sm font-semibold transition text-xs sm:text-sm px-3 sm:px-4 py-1.5">
+                <div class="flex justify-center w-full">
+                    <div class="bg-neutral-100 p-1.5 rounded-full flex items-center justify-center space-x-1 w-full max-w-sm">
+                        <button id="btn-traditional" onclick="setDilemmaMode('traditional')" class="custom-btn custom-btn-sm rounded-full bg-white text-neutral-900 shadow-sm font-semibold transition text-xs sm:text-sm px-3 sm:px-4 py-1.5 flex-1 justify-center">
                             Traditional Paradigm
                         </button>
-                        <button id="btn-hirqo" onclick="setDilemmaMode('hirqo')" class="custom-btn custom-btn-sm rounded-full text-neutral-600 hover:text-neutral-900 font-semibold transition text-xs sm:text-sm px-3 sm:px-4 py-1.5">
+                        <button id="btn-hirqo" onclick="setDilemmaMode('hirqo')" class="custom-btn custom-btn-sm rounded-full text-neutral-600 hover:text-neutral-900 font-semibold transition text-xs sm:text-sm px-3 sm:px-4 py-1.5 flex-1 justify-center">
                             The HirQo Way
                         </button>
                     </div>
@@ -583,7 +668,7 @@
 
         <!-- SECTION 3: COMPREHENSIVE INTERACTIVE HR USER JOURNEY SIMULATOR -->
         <section id="hr-workflow" class="space-y-6 scroll-mt-24">
-            <div class="space-y-2">
+            <div class="text-center sm:text-left space-y-2">
                 <span class="text-brand-600 font-bold text-xs uppercase tracking-widest">Interactive Walkthrough</span>
                 <h2 class="text-2xl sm:text-3xl font-extrabold text-neutral-900">HR & Hiring Team Journey Simulator</h2>
                 <p class="text-neutral-600 text-sm sm:text-base">
@@ -592,7 +677,7 @@
             </div>
 
             <!-- Stepper Tabs with Touch-Friendly Swipe -->
-            <div class="flex overflow-x-auto space-x-2 pb-3 border-b border-neutral-200 no-scrollbar touch-pan-x flex-nowrap shrink-0 -mx-1 px-1 sm:mx-0 sm:px-0">
+            <div class="flex overflow-x-auto gap-2 pb-3 border-b border-neutral-200 no-scrollbar touch-pan-x flex-nowrap w-full">
                 <button onclick="setWorkflowStep(0)" id="step-tab-0" class="custom-btn custom-btn-sm custom-btn-primary whitespace-nowrap shrink-0 text-xs sm:text-sm">
                     <span>Dashboard Overview</span>
                 </button>
@@ -621,7 +706,7 @@
 
         <!-- SECTION 4: CANDIDATE ASSESSMENT ENVIRONMENT (IDE SHOWCASE) -->
         <section id="candidate-sandbox" class="space-y-6 scroll-mt-24">
-            <div class="space-y-2">
+            <div class="text-center sm:text-left space-y-2">
                 <span class="text-brand-600 font-bold text-xs uppercase tracking-widest">Candidate Experience</span>
                 <h2 class="text-2xl sm:text-3xl font-extrabold text-neutral-900">Authentic Codebase & Guided AI Workspace</h2>
                 <p class="text-neutral-600 text-sm sm:text-base">
@@ -899,14 +984,14 @@
                     </div>
 
                     <!-- Calculated KPI Cards -->
-                    <div class="grid grid-cols-2 gap-4 pt-4 border-t border-neutral-200">
-                        <div class="bg-white p-4 rounded-xl border border-neutral-200 text-center shadow-sm">
-                            <span class="text-xs text-neutral-500 font-medium block">Monthly Hours Saved</span>
-                            <span id="res-hours-saved" class="text-2xl font-extrabold text-brand-600">140 hrs</span>
+                    <div class="grid grid-cols-2 gap-3 sm:gap-4 pt-4 border-t border-neutral-200">
+                        <div class="bg-white p-3 sm:p-4 rounded-xl border border-neutral-200 text-center shadow-sm">
+                            <span class="text-[11px] sm:text-xs text-neutral-500 font-medium block">Monthly Hours Saved</span>
+                            <span id="res-hours-saved" class="text-xl sm:text-2xl font-extrabold text-brand-600">140 hrs</span>
                         </div>
-                        <div class="bg-white p-4 rounded-xl border border-neutral-200 text-center shadow-sm">
-                            <span class="text-xs text-neutral-500 font-medium block">Est. Cost Savings</span>
-                            <span id="res-cost-saved" class="text-2xl font-extrabold text-emerald-600">$6,300</span>
+                        <div class="bg-white p-3 sm:p-4 rounded-xl border border-neutral-200 text-center shadow-sm">
+                            <span class="text-[11px] sm:text-xs text-neutral-500 font-medium block">Est. Cost Savings</span>
+                            <span id="res-cost-saved" class="text-xl sm:text-2xl font-extrabold text-emerald-600">$6,300</span>
                         </div>
                     </div>
                 </div>
@@ -961,7 +1046,7 @@
 
                 <!-- Persona 2: Engineering Managers -->
                 <div class="bg-white p-6 sm:p-7 rounded-2xl border-2 border-brand-500 shadow-md relative hover:border-brand-600 transition space-y-4 flex flex-col">
-                    <span class="absolute -top-3 right-5 bg-brand-600 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+                    <span class="absolute -top-3 left-1/2 -translate-x-1/2 sm:left-auto sm:translate-x-0 sm:right-5 bg-brand-600 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">
                         Core Evaluator
                     </span>
                     <div class="flex flex-col items-center sm:items-start text-center sm:text-left space-y-3">
@@ -1026,10 +1111,13 @@
                     We welcome the opportunity to share a personalized live demonstration of HirQo and discuss how it integrates with your tech hiring across Egypt and the GCC.
                 </p>
             </div>
-            <div class="pt-2 flex justify-center px-4">
-                <button onclick="openModal()" class="custom-btn custom-btn-primary w-full sm:w-auto justify-center" style="padding: 14px 30px; font-size: 15px;">
-                    <span style="white-space: normal; text-align: center;">Schedule a Live Platform Walkthrough</span>
-                    <svg class="w-4 h-4 shrink-0 flex-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+            <div class="pt-2 flex justify-center w-full max-w-md mx-auto">
+                <button onclick="openModal()" class="custom-btn custom-btn-primary custom-btn-lg w-full sm:w-auto justify-center rounded-2xl sm:rounded-full px-5 py-3.5 sm:px-8 sm:py-4 text-sm sm:text-base font-bold shadow-lg shadow-brand-600/25">
+                    <span>Schedule a Live Walkthrough</span>
+                    <svg class="w-4 h-4 shrink-0 flex-none" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                        <polyline points="12 5 19 12 12 19"></polyline>
+                    </svg>
                 </button>
             </div>
             <div class="text-xs text-neutral-500 pt-8 border-t border-neutral-800/80">
@@ -1165,11 +1253,11 @@
             const btnHirqo = document.getElementById('btn-hirqo');
 
             if (mode === 'traditional') {
-                btnTrad.className = "custom-btn custom-btn-sm rounded-full bg-white text-neutral-900 shadow-sm font-semibold transition";
-                btnHirqo.className = "custom-btn custom-btn-sm rounded-full text-neutral-600 hover:text-neutral-900 font-semibold transition";
+                btnTrad.className = "custom-btn custom-btn-sm rounded-full bg-white text-neutral-900 shadow-sm font-semibold transition text-xs sm:text-sm px-3 sm:px-4 py-1.5 flex-1 justify-center";
+                btnHirqo.className = "custom-btn custom-btn-sm rounded-full text-neutral-600 hover:text-neutral-900 font-semibold transition text-xs sm:text-sm px-3 sm:px-4 py-1.5 flex-1 justify-center";
             } else {
-                btnHirqo.className = "custom-btn custom-btn-sm rounded-full bg-brand-600 text-white shadow-sm font-semibold transition";
-                btnTrad.className = "custom-btn custom-btn-sm rounded-full text-neutral-600 hover:text-neutral-900 font-semibold transition";
+                btnHirqo.className = "custom-btn custom-btn-sm rounded-full bg-brand-600 text-white shadow-sm font-semibold transition text-xs sm:text-sm px-3 sm:px-4 py-1.5 flex-1 justify-center";
+                btnTrad.className = "custom-btn custom-btn-sm rounded-full text-neutral-600 hover:text-neutral-900 font-semibold transition text-xs sm:text-sm px-3 sm:px-4 py-1.5 flex-1 justify-center";
             }
 
             const data = dilemmaData[mode];
@@ -1238,10 +1326,12 @@
             
             for (let i = 0; i <= 5; i++) {
                 const tab = document.getElementById(`step-tab-${i}`);
-                if (i === step) {
-                    tab.className = "custom-btn custom-btn-sm custom-btn-primary";
-                } else {
-                    tab.className = "custom-btn custom-btn-sm custom-btn-ghost border border-neutral-200";
+                if (tab) {
+                    if (i === step) {
+                        tab.className = "custom-btn custom-btn-sm custom-btn-primary whitespace-nowrap shrink-0 text-xs sm:text-sm";
+                    } else {
+                        tab.className = "custom-btn custom-btn-sm custom-btn-ghost border border-neutral-200 whitespace-nowrap shrink-0 text-xs sm:text-sm";
+                    }
                 }
             }
 
@@ -1254,8 +1344,8 @@
                                 <h3 class="font-bold text-neutral-900 text-lg">Recruiter & Hiring Overview Dashboard</h3>
                                 <p class="text-xs text-neutral-500">Real-time status of active roles, pending candidate evaluations, and immediate priorities.</p>
                             </div>
-                            <span class="bg-brand-50 text-brand-700 text-xs px-3 py-1 rounded-full font-semibold border border-brand-200">
-                                Active Workspace: Abanoub Amir (Technical Hiring Lead)
+                            <span class="bg-brand-50 text-brand-700 text-[11px] sm:text-xs px-2.5 py-1 rounded-full font-semibold border border-brand-200">
+                                Active Workspace: Abanoub Amir
                             </span>
                         </div>
                         
@@ -1287,17 +1377,17 @@
                                     <span class="bg-amber-100 text-amber-800 text-[10px] px-2 py-0.5 rounded-full font-bold">Action Required</span>
                                 </span>
                                 <div class="space-y-2 text-xs">
-                                    <div class="p-3 bg-amber-50/80 rounded-xl border border-amber-200 flex justify-between items-center">
-                                        <span class="text-neutral-800 font-medium">Exams needing challenge generation</span>
-                                        <span class="font-bold text-amber-800 bg-amber-200/60 px-2 py-0.5 rounded">1 candidate</span>
+                                    <div class="p-3 bg-amber-50/80 rounded-xl border border-amber-200 flex justify-between items-center gap-2">
+                                        <span class="text-neutral-800 font-medium text-xs">Exams needing challenge generation</span>
+                                        <span class="font-bold text-amber-800 bg-amber-200/60 px-2 py-0.5 rounded text-[11px] shrink-0">1 candidate</span>
                                     </div>
-                                    <div class="p-3 bg-neutral-50 rounded-xl border border-neutral-200 flex justify-between items-center">
-                                        <span class="text-neutral-700 font-medium">Exams missing scheduled time slot</span>
-                                        <span class="font-bold text-neutral-700 bg-neutral-200 px-2 py-0.5 rounded">1 candidate</span>
+                                    <div class="p-3 bg-neutral-50 rounded-xl border border-neutral-200 flex justify-between items-center gap-2">
+                                        <span class="text-neutral-700 font-medium text-xs">Exams missing scheduled time slot</span>
+                                        <span class="font-bold text-neutral-700 bg-neutral-200 px-2 py-0.5 rounded text-[11px] shrink-0">1 candidate</span>
                                     </div>
-                                    <div class="p-3 bg-brand-50/70 rounded-xl border border-brand-200 flex justify-between items-center">
-                                        <span class="text-brand-900 font-medium">Upcoming assessments awaiting slot confirmation</span>
-                                        <span class="font-bold text-brand-700 bg-brand-100 px-2 py-0.5 rounded">3 candidates</span>
+                                    <div class="p-3 bg-brand-50/70 rounded-xl border border-brand-200 flex justify-between items-center gap-2">
+                                        <span class="text-brand-900 font-medium text-xs">Upcoming assessments awaiting slot confirmation</span>
+                                        <span class="font-bold text-brand-700 bg-brand-100 px-2 py-0.5 rounded text-[11px] shrink-0">3 candidates</span>
                                     </div>
                                 </div>
                             </div>
@@ -1409,51 +1499,51 @@
                                 <h3 class="font-bold text-neutral-900 text-lg">Step 2: Automated AI CV Screening & Ranking</h3>
                                 <p class="text-xs text-neutral-500">Applicant resumes are scored automatically against role requirements and technical depth.</p>
                             </div>
-                            <div class="flex items-center space-x-2">
-                                <button onclick="filterCandidates('all')" id="filter-all" class="custom-btn custom-btn-sm custom-btn-primary">All (4)</button>
-                                <button onclick="filterCandidates('shortlisted')" id="filter-shortlisted" class="custom-btn custom-btn-sm custom-btn-ghost border border-neutral-200">Shortlisted (3)</button>
-                                <button onclick="filterCandidates('rejected')" id="filter-rejected" class="custom-btn custom-btn-sm custom-btn-ghost border border-neutral-200">Rejected (1)</button>
+                            <div class="flex flex-wrap items-center gap-2">
+                                <button onclick="filterCandidates('all')" id="filter-all" class="custom-btn custom-btn-sm custom-btn-primary text-xs sm:text-sm px-3 py-1.5">All (4)</button>
+                                <button onclick="filterCandidates('shortlisted')" id="filter-shortlisted" class="custom-btn custom-btn-sm custom-btn-ghost border border-neutral-200 text-xs sm:text-sm px-3 py-1.5">Shortlisted (3)</button>
+                                <button onclick="filterCandidates('rejected')" id="filter-rejected" class="custom-btn custom-btn-sm custom-btn-ghost border border-neutral-200 text-xs sm:text-sm px-3 py-1.5">Rejected (1)</button>
                             </div>
                         </div>
                         <div class="overflow-x-auto rounded-2xl border border-neutral-200">
-                            <table class="w-full text-left text-xs">
+                            <table class="w-full text-left text-xs cv-table">
                                 <thead class="bg-neutral-50 text-neutral-500 uppercase font-semibold border-b border-neutral-200">
                                     <tr>
-                                        <th class="p-3.5">Candidate Name</th>
-                                        <th class="p-3.5 table-col-hide-mobile">Primary Tech Stack</th>
-                                        <th class="p-3.5 table-col-hide-mobile">Experience</th>
-                                        <th class="p-3.5">Match Score</th>
-                                        <th class="p-3.5">Recommendation</th>
+                                        <th class="p-2 sm:p-3.5">Candidate Name</th>
+                                        <th class="p-2 sm:p-3.5 table-col-hide-mobile">Primary Tech Stack</th>
+                                        <th class="p-2 sm:p-3.5 table-col-hide-mobile">Experience</th>
+                                        <th class="p-2 sm:p-3.5">Match Score</th>
+                                        <th class="p-2 sm:p-3.5">Recommendation</th>
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-neutral-100 font-medium" id="candidates-table-body">
                                     <tr class="hover:bg-neutral-50/80 cand-row cand-shortlisted">
-                                        <td class="p-3.5 text-neutral-900 font-bold">Sara Ali</td>
-                                        <td class="p-3.5 table-col-hide-mobile">TypeScript, Node.js, PostgreSQL</td>
-                                        <td class="p-3.5 table-col-hide-mobile">5 Years</td>
-                                        <td class="p-3.5 text-emerald-600 font-extrabold text-sm">92% Match</td>
-                                        <td class="p-3.5"><span class="bg-emerald-100 text-emerald-800 text-[11px] px-2.5 py-0.5 rounded-full font-bold">Shortlisted</span></td>
+                                        <td class="p-2 sm:p-3.5 text-neutral-900 font-bold">Sara Ali</td>
+                                        <td class="p-2 sm:p-3.5 table-col-hide-mobile">TypeScript, Node.js, PostgreSQL</td>
+                                        <td class="p-2 sm:p-3.5 table-col-hide-mobile">5 Years</td>
+                                        <td class="p-2 sm:p-3.5 text-emerald-600 font-extrabold text-sm">92% Match</td>
+                                        <td class="p-2 sm:p-3.5"><span class="bg-emerald-100 text-emerald-800 text-[11px] px-2 py-0.5 rounded-full font-bold">Shortlisted</span></td>
                                     </tr>
                                     <tr class="hover:bg-neutral-50/80 cand-row cand-shortlisted">
-                                        <td class="p-3.5 text-neutral-900 font-bold">Omar Hassan</td>
-                                        <td class="p-3.5 table-col-hide-mobile">Node.js, Redis, Concurrency</td>
-                                        <td class="p-3.5 table-col-hide-mobile">4 Years</td>
-                                        <td class="p-3.5 text-brand-600 font-extrabold text-sm">84% Match</td>
-                                        <td class="p-3.5"><span class="bg-emerald-100 text-emerald-800 text-[11px] px-2.5 py-0.5 rounded-full font-bold">Shortlisted</span></td>
+                                        <td class="p-2 sm:p-3.5 text-neutral-900 font-bold">Omar Hassan</td>
+                                        <td class="p-2 sm:p-3.5 table-col-hide-mobile">Node.js, Redis, Concurrency</td>
+                                        <td class="p-2 sm:p-3.5 table-col-hide-mobile">4 Years</td>
+                                        <td class="p-2 sm:p-3.5 text-brand-600 font-extrabold text-sm">84% Match</td>
+                                        <td class="p-2 sm:p-3.5"><span class="bg-emerald-100 text-emerald-800 text-[11px] px-2 py-0.5 rounded-full font-bold">Shortlisted</span></td>
                                     </tr>
                                     <tr class="hover:bg-neutral-50/80 cand-row cand-shortlisted">
-                                        <td class="p-3.5 text-neutral-900 font-bold">Layla Nabil</td>
-                                        <td class="p-3.5 table-col-hide-mobile">Fullstack JS, Docker, AWS</td>
-                                        <td class="p-3.5 table-col-hide-mobile">3 Years</td>
-                                        <td class="p-3.5 text-brand-600 font-extrabold text-sm">78% Match</td>
-                                        <td class="p-3.5"><span class="bg-emerald-100 text-emerald-800 text-[11px] px-2.5 py-0.5 rounded-full font-bold">Shortlisted</span></td>
+                                        <td class="p-2 sm:p-3.5 text-neutral-900 font-bold">Layla Nabil</td>
+                                        <td class="p-2 sm:p-3.5 table-col-hide-mobile">Fullstack JS, Docker, AWS</td>
+                                        <td class="p-2 sm:p-3.5 table-col-hide-mobile">3 Years</td>
+                                        <td class="p-2 sm:p-3.5 text-brand-600 font-extrabold text-sm">78% Match</td>
+                                        <td class="p-2 sm:p-3.5"><span class="bg-emerald-100 text-emerald-800 text-[11px] px-2 py-0.5 rounded-full font-bold">Shortlisted</span></td>
                                     </tr>
                                     <tr class="hover:bg-neutral-50/80 cand-row cand-rejected">
-                                        <td class="p-3.5 text-neutral-900 font-bold">Tarek Mahmoud</td>
-                                        <td class="p-3.5 table-col-hide-mobile">PHP, WordPress, MySQL</td>
-                                        <td class="p-3.5 table-col-hide-mobile">2 Years</td>
-                                        <td class="p-3.5 text-rose-500 font-extrabold text-sm">42% Match</td>
-                                        <td class="p-3.5"><span class="bg-rose-100 text-rose-800 text-[11px] px-2.5 py-0.5 rounded-full font-bold">Below Threshold</span></td>
+                                        <td class="p-2 sm:p-3.5 text-neutral-900 font-bold">Tarek Mahmoud</td>
+                                        <td class="p-2 sm:p-3.5 table-col-hide-mobile">PHP, WordPress, MySQL</td>
+                                        <td class="p-2 sm:p-3.5 table-col-hide-mobile">2 Years</td>
+                                        <td class="p-2 sm:p-3.5 text-rose-500 font-extrabold text-sm">42% Match</td>
+                                        <td class="p-2 sm:p-3.5"><span class="bg-rose-100 text-rose-800 text-[11px] px-2 py-0.5 rounded-full font-bold">Below Threshold</span></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -1640,9 +1730,9 @@
 
         function filterCandidates(type) {
             const rows = document.querySelectorAll('.cand-row');
-            document.getElementById('filter-all').className = type === 'all' ? 'custom-btn custom-btn-sm custom-btn-primary' : 'custom-btn custom-btn-sm custom-btn-ghost border border-neutral-200';
-            document.getElementById('filter-shortlisted').className = type === 'shortlisted' ? 'custom-btn custom-btn-sm custom-btn-primary' : 'custom-btn custom-btn-sm custom-btn-ghost border border-neutral-200';
-            document.getElementById('filter-rejected').className = type === 'rejected' ? 'custom-btn custom-btn-sm custom-btn-primary' : 'custom-btn custom-btn-sm custom-btn-ghost border border-neutral-200';
+            document.getElementById('filter-all').className = type === 'all' ? 'custom-btn custom-btn-sm custom-btn-primary text-xs sm:text-sm px-3 py-1.5' : 'custom-btn custom-btn-sm custom-btn-ghost border border-neutral-200 text-xs sm:text-sm px-3 py-1.5';
+            document.getElementById('filter-shortlisted').className = type === 'shortlisted' ? 'custom-btn custom-btn-sm custom-btn-primary text-xs sm:text-sm px-3 py-1.5' : 'custom-btn custom-btn-sm custom-btn-ghost border border-neutral-200 text-xs sm:text-sm px-3 py-1.5';
+            document.getElementById('filter-rejected').className = type === 'rejected' ? 'custom-btn custom-btn-sm custom-btn-primary text-xs sm:text-sm px-3 py-1.5' : 'custom-btn custom-btn-sm custom-btn-ghost border border-neutral-200 text-xs sm:text-sm px-3 py-1.5';
 
             rows.forEach(row => {
                 if (type === 'all') {
@@ -1669,7 +1759,7 @@
             candidateRadarChartInstance = new Chart(canvas.getContext('2d'), {
                 type: 'radar',
                 data: {
-                    labels: ['Problem Solving', 'Code Hygiene', 'AI Prompt Quality', 'System Design', 'Communication'],
+                    labels: ['Problem Solving', 'Code Hygiene', 'AI Quality', 'System Design', 'Communication'],
                     datasets: [{
                         label: 'Sara Ali Evaluation',
                         data: [90, 88, 95, 76, 88],
@@ -1685,6 +1775,7 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    layout: { padding: 10 },
                     scales: {
                         r: {
                             min: 0,
@@ -1735,7 +1826,7 @@
             roiChartInstance = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: ['Traditional Process', 'With HirQo Platform'],
+                    labels: [['Traditional', 'Process'], ['With HirQo', 'Platform']],
                     datasets: [{
                         label: 'Evaluation Hours Spent / Month',
                         data: [tradHours, hirqoHours],
