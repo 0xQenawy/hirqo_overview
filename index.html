@@ -86,6 +86,10 @@
             --font-family-mono: 'JetBrains Mono', monospace;
         }
 
+        *, *::before, *::after {
+            box-sizing: border-box;
+        }
+
         html {
             overflow-x: hidden;
             max-width: 100%;
@@ -232,6 +236,16 @@
             max-height: 380px;
         }
 
+        .radar-chart-container {
+            height: 250px;
+            max-height: 270px;
+        }
+
+        /* Ensure all canvas and svg elements respect parent bounds */
+        canvas, svg {
+            max-width: 100%;
+        }
+
         /* Custom Scrollbars */
         ::-webkit-scrollbar {
             width: 6px;
@@ -321,7 +335,7 @@
         @media (max-width: 640px) {
             html, body {
                 overflow-x: hidden !important;
-                max-width: 100vw !important;
+                max-width: 100% !important;
                 width: 100% !important;
             }
 
@@ -335,7 +349,11 @@
                 max-height: 240px !important;
                 width: 100% !important;
                 max-width: 100% !important;
-                overflow: hidden !important;
+            }
+
+            .radar-chart-container {
+                height: 225px !important;
+                max-height: 245px !important;
             }
 
             /* Allow all buttons to wrap text on mobile instead of forcing overflow */
@@ -372,12 +390,18 @@
                 padding: 5px 12px !important;
             }
 
-            /* Code blocks wrap safely without overflow */
+            /* Code blocks scroll safely without overflowing page */
             pre {
-                white-space: pre-wrap !important;
-                word-break: break-word !important;
+                white-space: pre !important;
+                word-break: normal !important;
                 max-width: 100% !important;
                 overflow-x: auto !important;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            /* Prevent iOS Safari 16px auto-zoom on input focus */
+            input, select, textarea {
+                font-size: 16px !important;
             }
 
             /* CV table hide less important columns on mobile */
@@ -385,7 +409,8 @@
 
             /* CV table cells compact on mobile */
             .cv-table th, .cv-table td {
-                padding: 8px 10px !important;
+                padding: 8px 8px !important;
+                white-space: nowrap;
             }
 
             /* Stack Step 5 action buttons */
@@ -396,8 +421,8 @@
             .section-label-center { display: block; text-align: center; }
         }
 
-        @media (max-width: 768px) {
-            /* IDE sidebar stacks below code on mobile */
+        @media (max-width: 1023px) {
+            /* IDE sidebar stacks cleanly on mobile and tablets below desktop lg: */
             .ide-grid {
                 display: flex !important;
                 flex-direction: column !important;
@@ -418,7 +443,7 @@
             }
         }
 
-        /* Stakeholder card ul centering on mobile */
+        /* Stakeholder card ul formatting on mobile */
         @media (max-width: 640px) {
             .persona-card-ul {
                 text-align: left;
@@ -433,15 +458,16 @@
                 width: 100%;
             }
         }
+
     </style>
 </head>
 <body class="bg-neutral-50 text-neutral-900 selection:bg-brand-600 selection:text-white">
 
     <!-- NAVIGATION HEADER (Frosted Glass & Official Logo) -->
     <header class="sticky top-0 z-50 glass-header">
-        <div class="w-full px-4 sm:px-8 lg:px-12 h-16 flex items-center justify-between">
+        <div class="w-full px-3.5 sm:px-8 lg:px-12 h-16 flex items-center justify-between gap-2">
             <!-- Brand Logo with Real Asset (Pushed Left) -->
-            <div class="flex items-center space-x-2 sm:space-x-3">
+            <div class="flex items-center space-x-2 sm:space-x-3 shrink-0">
                 <a href="#" class="flex items-center py-1 group" aria-label="HirQo Platform">
                     <img src="assets/logo_colored.png" onerror="this.src='../src/assets/logo_colored.png'" alt="HirQo Logo" class="h-6 sm:h-7 w-auto object-contain transition-transform duration-200 group-hover:scale-105" />
                 </a>
@@ -464,8 +490,8 @@
             </nav>
 
             <!-- Action Button & Mobile Hamburger Toggle -->
-            <div class="flex items-center space-x-2 sm:space-x-3">
-                <button onclick="openModal()" class="custom-btn custom-btn-primary custom-btn-sm text-xs sm:text-sm px-3 sm:px-4 py-1.5 sm:py-2">
+            <div class="flex items-center space-x-1.5 sm:space-x-3 shrink-0">
+                <button onclick="openModal()" class="custom-btn custom-btn-primary custom-btn-sm text-xs sm:text-sm px-2.5 sm:px-4 py-1.5 sm:py-2">
                     <span class="hidden sm:inline">Request </span><span>Walkthrough</span>
                     <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -524,7 +550,7 @@
 
                 <!-- Subtitle -->
                 <p class="text-neutral-300 text-sm sm:text-base lg:text-lg leading-relaxed max-w-2xl font-normal">
-                    HirQo evaluates technical candidates inside real codebase environments with modern developer tools—including guided AI assistance—delivering defensible evidence instead of gut feelings.
+                    HirQo evaluates technical candidates inside real codebase environments with modern developer tools—including guided AI assistance—delivering proven evidence instead of gut feelings.
                 </p>
 
                 <!-- Actions -->
@@ -542,22 +568,22 @@
                 </div>
 
                 <!-- Key Impact Metrics Banner -->
-                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-6 pt-6 sm:pt-8 border-t border-neutral-800/90 mt-6 sm:mt-8 w-full text-center sm:text-left">
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-6 pt-6 sm:pt-8 border-t border-neutral-800/90 mt-6 sm:mt-8 w-full text-center sm:text-left">
                     <div>
-                        <div class="text-2xl sm:text-3xl font-extrabold text-brand-400">85%</div>
-                        <div class="text-[11px] sm:text-xs text-neutral-400 font-medium mt-1">Faster CV Screening</div>
+                        <div class="text-xl sm:text-3xl font-extrabold text-brand-400">85%</div>
+                        <div class="text-[10.5px] sm:text-xs text-neutral-400 font-medium mt-1 leading-tight">Faster CV Screening</div>
                     </div>
                     <div>
-                        <div class="text-2xl sm:text-3xl font-extrabold text-emerald-400">100%</div>
-                        <div class="text-[11px] sm:text-xs text-neutral-400 font-medium mt-1">Real Codebase Work</div>
+                        <div class="text-xl sm:text-3xl font-extrabold text-emerald-400">100%</div>
+                        <div class="text-[10.5px] sm:text-xs text-neutral-400 font-medium mt-1 leading-tight">Real Codebase Work</div>
                     </div>
                     <div>
-                        <div class="text-2xl sm:text-3xl font-extrabold text-sky-400">360°</div>
-                        <div class="text-[11px] sm:text-xs text-neutral-400 font-medium mt-1">AI Prompt Insights</div>
+                        <div class="text-xl sm:text-3xl font-extrabold text-sky-400">360°</div>
+                        <div class="text-[10.5px] sm:text-xs text-neutral-400 font-medium mt-1 leading-tight">AI Prompt Insights</div>
                     </div>
                     <div>
-                        <div class="text-2xl sm:text-3xl font-extrabold text-amber-400">Zero</div>
-                        <div class="text-[11px] sm:text-xs text-neutral-400 font-medium mt-1">Opaque Guesswork</div>
+                        <div class="text-xl sm:text-3xl font-extrabold text-amber-400">Zero</div>
+                        <div class="text-[10.5px] sm:text-xs text-neutral-400 font-medium mt-1 leading-tight">Hiring Guesswork</div>
                     </div>
                 </div>
             </div>
@@ -577,11 +603,11 @@
             <!-- Interactive Dilemma Switcher -->
             <div class="bg-white p-5 sm:p-8 rounded-3xl border border-neutral-200 shadow-sm space-y-6 sm:space-y-8">
                 <div class="flex justify-center w-full">
-                    <div class="bg-neutral-100 p-1.5 rounded-full flex items-center justify-center space-x-1 w-full max-w-sm">
-                        <button id="btn-traditional" onclick="setDilemmaMode('traditional')" class="custom-btn custom-btn-sm rounded-full bg-white text-neutral-900 shadow-sm font-semibold transition text-xs sm:text-sm px-3 sm:px-4 py-1.5 flex-1 justify-center">
-                            Traditional Paradigm
+                    <div class="bg-neutral-100 p-1 sm:p-1.5 rounded-full flex items-center justify-center gap-1 w-full max-w-sm">
+                        <button id="btn-traditional" onclick="setDilemmaMode('traditional')" class="custom-btn custom-btn-sm rounded-full bg-white text-neutral-900 shadow-sm font-semibold transition text-xs sm:text-sm px-2.5 sm:px-4 py-1.5 flex-1 justify-center">
+                            Traditional Hiring
                         </button>
-                        <button id="btn-hirqo" onclick="setDilemmaMode('hirqo')" class="custom-btn custom-btn-sm rounded-full text-neutral-600 hover:text-neutral-900 font-semibold transition text-xs sm:text-sm px-3 sm:px-4 py-1.5 flex-1 justify-center">
+                        <button id="btn-hirqo" onclick="setDilemmaMode('hirqo')" class="custom-btn custom-btn-sm rounded-full text-neutral-600 hover:text-neutral-900 font-semibold transition text-xs sm:text-sm px-2.5 sm:px-4 py-1.5 flex-1 justify-center">
                             The HirQo Way
                         </button>
                     </div>
@@ -595,7 +621,7 @@
 
                     <!-- Chart Container -->
                     <div class="bg-neutral-50 p-5 rounded-2xl border border-neutral-200">
-                        <div class="text-xs font-bold text-neutral-500 uppercase tracking-wider mb-2 text-center">Hiring Decision Reliability Index</div>
+                        <div class="text-xs font-bold text-neutral-500 uppercase tracking-wider mb-2 text-center">Hiring Accuracy &amp; Confidence</div>
                         <div class="chart-container">
                             <canvas id="dilemmaChart"></canvas>
                         </div>
@@ -614,7 +640,7 @@
                 </p>
             </div>
 
-            <div class="grid sm:grid-cols-2 md:grid-cols-3 gap-5 sm:gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6">
                 <!-- Pillar 1 -->
                 <div class="bg-white p-6 sm:p-7 rounded-2xl border border-neutral-200 shadow-sm space-y-4 hover:border-brand-300 transition group flex flex-col items-center sm:items-start text-center sm:text-left">
                     <div class="w-12 h-12 rounded-2xl bg-brand-50 text-brand-600 flex items-center justify-center group-hover:bg-brand-600 group-hover:text-white transition shrink-0">
@@ -660,47 +686,347 @@
                     </div>
                     <h3 class="font-bold text-neutral-900 text-lg">Evidence-Based Reports</h3>
                     <p class="text-sm text-neutral-600 leading-relaxed">
-                        Every conclusion is supported by concrete session evidence: prompt quality scores, test suite results, code hygiene, and architectural trade-off reasoning.
+                        Every conclusion is supported by concrete session evidence: prompt quality scores, test suite results, clean code quality, and architectural reasoning.
                     </p>
                 </div>
             </div>
         </section>
 
-        <!-- SECTION 3: COMPREHENSIVE INTERACTIVE HR USER JOURNEY SIMULATOR -->
-        <section id="hr-workflow" class="space-y-6 scroll-mt-24">
+        <!-- SECTION 3: CONTINUOUS SCROLLABLE RECRUITMENT JOURNEY -->
+        <section id="hr-workflow" class="space-y-8 scroll-mt-24">
             <div class="text-center sm:text-left space-y-2">
-                <span class="text-brand-600 font-bold text-xs uppercase tracking-widest">Interactive Walkthrough</span>
-                <h2 class="text-2xl sm:text-3xl font-extrabold text-neutral-900">HR & Hiring Team Journey Simulator</h2>
-                <p class="text-neutral-600 text-sm sm:text-base">
-                    Click through the steps below to experience how HR leaders and engineering managers manage technical hiring inside HirQo from opening to decision.
+                <span class="text-brand-600 font-bold text-xs uppercase tracking-widest">End-to-End User Flow</span>
+                <h2 class="text-2xl sm:text-3xl font-extrabold text-neutral-900">The Hiring Journey: From Job Opening to Offer</h2>
+                <p class="text-neutral-600 text-sm sm:text-base max-w-3xl">
+                    Experience how HirQo streamlines the complete technical hiring lifecycle. Every stage below is designed for speed, objective evaluations, and candidate transparency.
                 </p>
             </div>
 
-            <!-- Stepper Tabs with Touch-Friendly Swipe -->
-            <div class="flex overflow-x-auto gap-2 pb-3 border-b border-neutral-200 no-scrollbar touch-pan-x flex-nowrap w-full">
-                <button onclick="setWorkflowStep(0)" id="step-tab-0" class="custom-btn custom-btn-sm custom-btn-primary whitespace-nowrap shrink-0 text-xs sm:text-sm">
-                    <span>Dashboard Overview</span>
-                </button>
-                <button onclick="setWorkflowStep(1)" id="step-tab-1" class="custom-btn custom-btn-sm custom-btn-ghost border border-neutral-200 whitespace-nowrap shrink-0 text-xs sm:text-sm">
-                    <span>1. Role & Form Builder</span>
-                </button>
-                <button onclick="setWorkflowStep(2)" id="step-tab-2" class="custom-btn custom-btn-sm custom-btn-ghost border border-neutral-200 whitespace-nowrap shrink-0 text-xs sm:text-sm">
-                    <span>2. AI CV Screening</span>
-                </button>
-                <button onclick="setWorkflowStep(3)" id="step-tab-3" class="custom-btn custom-btn-sm custom-btn-ghost border border-neutral-200 whitespace-nowrap shrink-0 text-xs sm:text-sm">
-                    <span>3. Assessment Suite</span>
-                </button>
-                <button onclick="setWorkflowStep(4)" id="step-tab-4" class="custom-btn custom-btn-sm custom-btn-ghost border border-neutral-200 whitespace-nowrap shrink-0 text-xs sm:text-sm">
-                    <span>4. Candidate Report</span>
-                </button>
-                <button onclick="setWorkflowStep(5)" id="step-tab-5" class="custom-btn custom-btn-sm custom-btn-ghost border border-neutral-200 whitespace-nowrap shrink-0 text-xs sm:text-sm">
-                    <span>5. Decision & Comms</span>
-                </button>
-            </div>
+            <!-- Connected Vertical Timeline Flow -->
+            <div class="space-y-6 sm:space-y-8">
 
-            <!-- Active Step Content Sandbox Panel -->
-            <div class="bg-white rounded-3xl border border-neutral-200 shadow-sm p-4 sm:p-8 min-h-[460px]" id="workflow-panel">
-                <!-- Renders dynamically via JS -->
+                <!-- STAGE 01: ROLE CREATION & CANDIDATE APPLICATION -->
+                <div class="flex items-start gap-3.5 sm:gap-6">
+                    <div class="flex flex-col items-center self-stretch shrink-0 pt-1">
+                        <div class="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-brand-600 text-white font-extrabold text-xs sm:text-sm flex items-center justify-center ring-4 ring-brand-100 shadow-sm shrink-0">
+                            01
+                        </div>
+                        <div class="w-0.5 bg-brand-200 flex-1 my-2 rounded-full"></div>
+                    </div>
+                    <div class="flex-1 min-w-0 bg-white rounded-3xl border border-neutral-200 shadow-sm p-4 sm:p-7 space-y-5">
+                        <div class="flex flex-wrap items-center justify-between border-b border-neutral-200 pb-4 gap-2">
+                            <div>
+                                <span class="text-xs font-bold text-brand-600 uppercase tracking-wider block mb-0.5">Stage 01 • Role Setup</span>
+                                <h3 class="font-bold text-neutral-900 text-lg sm:text-xl">Role Creation & Application Form Builder</h3>
+                                <p class="text-xs text-neutral-500">Configure role requirements, custom technical screening questions, and published candidate application forms.</p>
+                            </div>
+                            <span class="bg-brand-50 text-brand-700 text-xs px-3 py-1 rounded-full font-semibold border border-brand-200">
+                                Position: Senior Backend Engineer
+                            </span>
+                        </div>
+
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <!-- Left: Form Builder Configuration -->
+                            <div class="bg-neutral-50 p-3.5 sm:p-5 rounded-2xl border border-neutral-200 space-y-3">
+                                <span class="text-xs font-bold text-neutral-800 uppercase tracking-wider block">Configured Application Fields</span>
+                                <div class="space-y-2 text-xs">
+                                    <div class="p-2.5 sm:p-3 bg-white rounded-xl border border-neutral-200 flex justify-between items-center gap-2 shadow-sm">
+                                        <div class="min-w-0 flex-1">
+                                            <span class="font-semibold text-neutral-900 block truncate sm:whitespace-normal">Personal Profile & Resume CV</span>
+                                            <span class="text-neutral-500 text-[11px] block leading-tight">Full name, email, phone, and PDF/Word resume upload</span>
+                                        </div>
+                                        <span class="text-emerald-700 font-bold bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200 shrink-0">Required</span>
+                                    </div>
+                                    <div class="p-2.5 sm:p-3 bg-white rounded-xl border border-neutral-200 flex justify-between items-center gap-2 shadow-sm">
+                                        <div class="min-w-0 flex-1">
+                                            <span class="font-semibold text-neutral-900 block truncate sm:whitespace-normal">Required Tech Stack Skills</span>
+                                            <span class="text-neutral-500 text-[11px] block leading-tight">Node.js, TypeScript, PostgreSQL, Redis, Docker</span>
+                                        </div>
+                                        <span class="text-emerald-700 font-bold bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200 shrink-0">Required</span>
+                                    </div>
+                                    <div class="p-2.5 sm:p-3 bg-white rounded-xl border border-neutral-200 flex justify-between items-center gap-2 shadow-sm">
+                                        <div class="min-w-0 flex-1">
+                                            <span class="font-semibold text-neutral-900 block truncate sm:whitespace-normal">GitHub & Portfolio Links</span>
+                                            <span class="text-neutral-500 text-[11px] block leading-tight">Open source contributions and production project references</span>
+                                        </div>
+                                        <span class="text-neutral-500 bg-neutral-100 px-2.5 py-0.5 rounded-full shrink-0">Optional</span>
+                                    </div>
+                                    <div class="p-2.5 sm:p-3 bg-white rounded-xl border border-neutral-200 flex justify-between items-center gap-2 shadow-sm">
+                                        <div class="min-w-0 flex-1">
+                                            <span class="font-semibold text-neutral-900 block truncate sm:whitespace-normal">Custom Architecture Question</span>
+                                            <span class="text-neutral-500 text-[11px] block leading-tight">"Explain how you design idempotent APIs under concurrent load"</span>
+                                        </div>
+                                        <span class="text-emerald-700 font-bold bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200 shrink-0">Required</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Right: Published Application Form Preview -->
+                            <div class="bg-white p-3.5 sm:p-5 rounded-2xl border border-neutral-200 shadow-sm space-y-4 flex flex-col justify-between">
+                                <div class="space-y-3">
+                                    <div class="flex items-center justify-between border-b border-neutral-100 pb-3 gap-2">
+                                        <span class="text-xs font-bold text-neutral-800 uppercase tracking-wider">Candidate Application Form Preview</span>
+                                        <span class="text-[11px] bg-emerald-50 text-emerald-700 font-semibold px-2.5 py-0.5 rounded-full border border-emerald-200 shrink-0">● Live & Accepting</span>
+                                    </div>
+                                    <div class="space-y-2 text-xs">
+                                        <div class="p-3 bg-neutral-50 rounded-xl border border-neutral-100 space-y-1.5">
+                                            <div class="flex items-center justify-between">
+                                                <span class="text-neutral-500 text-[10.5px] uppercase font-bold tracking-wider">Application Pipeline Status</span>
+                                                <span class="text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full font-bold text-[10px] border border-emerald-200">Active Applications</span>
+                                            </div>
+                                            <p class="text-neutral-700 text-xs font-medium">Candidate application form is active — submissions directly sync with your recruitment board.</p>
+                                        </div>
+                                        <div class="p-3 bg-neutral-50 rounded-xl border border-neutral-100 space-y-1">
+                                            <span class="text-neutral-400 text-[10px] uppercase font-bold tracking-wider block">Application Screening Pipeline</span>
+                                            <p class="text-neutral-600 text-[11.5px] leading-relaxed">Incoming candidate submissions automatically advance to Stage 02: Instant AI CV screening & match scoring against role requirements.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="p-3 bg-brand-50/60 rounded-xl border border-brand-100 text-xs text-brand-800 flex items-center gap-2">
+                                    <svg class="w-4 h-4 text-brand-600 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
+                                    <span>Built-in verification safeguards against spam and low-relevance submissions.</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STAGE 02: AUTOMATED AI CV SCREENING -->
+                <div class="flex items-start gap-3.5 sm:gap-6">
+                    <div class="flex flex-col items-center self-stretch shrink-0 pt-1">
+                        <div class="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-brand-600 text-white font-extrabold text-xs sm:text-sm flex items-center justify-center ring-4 ring-brand-100 shadow-sm shrink-0">
+                            02
+                        </div>
+                        <div class="w-0.5 bg-brand-200 flex-1 my-2 rounded-full"></div>
+                    </div>
+                    <div class="flex-1 min-w-0 bg-white rounded-3xl border border-neutral-200 shadow-sm p-4 sm:p-7 space-y-4">
+                        <div class="flex flex-wrap items-center justify-between border-b border-neutral-200 pb-4 gap-2">
+                            <div>
+                                <span class="text-xs font-bold text-brand-600 uppercase tracking-wider block mb-0.5">Stage 02 • AI Screening</span>
+                                <h3 class="font-bold text-neutral-900 text-lg sm:text-xl">Automated AI CV Screening & Match Scoring</h3>
+                                <p class="text-xs text-neutral-500">Applicant resumes are scored automatically against role requirements and verified technical depth.</p>
+                            </div>
+                            <div class="flex flex-wrap items-center gap-2">
+                                <button type="button" onclick="filterCandidates('all')" id="filter-all" class="custom-btn custom-btn-sm custom-btn-primary text-xs sm:text-sm px-3 py-1.5">All (4)</button>
+                                <button type="button" onclick="filterCandidates('shortlisted')" id="filter-shortlisted" class="custom-btn custom-btn-sm custom-btn-ghost border border-neutral-200 text-xs sm:text-sm px-3 py-1.5">Shortlisted (3)</button>
+                                <button type="button" onclick="filterCandidates('rejected')" id="filter-rejected" class="custom-btn custom-btn-sm custom-btn-ghost border border-neutral-200 text-xs sm:text-sm px-3 py-1.5">Rejected (1)</button>
+                            </div>
+                        </div>
+
+                        <div class="overflow-x-auto rounded-2xl border border-neutral-200">
+                            <table class="w-full text-left text-xs cv-table">
+                                <thead class="bg-neutral-50 text-neutral-500 uppercase font-semibold border-b border-neutral-200">
+                                    <tr>
+                                        <th class="p-2.5 sm:p-3.5">Candidate Name</th>
+                                        <th class="p-2.5 sm:p-3.5 table-col-hide-mobile">Primary Tech Stack</th>
+                                        <th class="p-2.5 sm:p-3.5 table-col-hide-mobile">Experience</th>
+                                        <th class="p-2.5 sm:p-3.5">Match Score</th>
+                                        <th class="p-2.5 sm:p-3.5">Recommendation</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-neutral-100 font-medium" id="candidates-table-body">
+                                    <tr class="hover:bg-neutral-50/80 cand-row cand-shortlisted">
+                                        <td class="p-2.5 sm:p-3.5 text-neutral-900 font-bold">Sara Ali</td>
+                                        <td class="p-2.5 sm:p-3.5 table-col-hide-mobile">TypeScript, Node.js, PostgreSQL</td>
+                                        <td class="p-2.5 sm:p-3.5 table-col-hide-mobile">5 Years</td>
+                                        <td class="p-2.5 sm:p-3.5 text-emerald-600 font-extrabold text-sm">92% Match</td>
+                                        <td class="p-2.5 sm:p-3.5"><span class="bg-emerald-100 text-emerald-800 text-[11px] px-2.5 py-0.5 rounded-full font-bold">Shortlisted</span></td>
+                                    </tr>
+                                    <tr class="hover:bg-neutral-50/80 cand-row cand-shortlisted">
+                                        <td class="p-2.5 sm:p-3.5 text-neutral-900 font-bold">Omar Hassan</td>
+                                        <td class="p-2.5 sm:p-3.5 table-col-hide-mobile">Node.js, Redis, Concurrency</td>
+                                        <td class="p-2.5 sm:p-3.5 table-col-hide-mobile">4 Years</td>
+                                        <td class="p-2.5 sm:p-3.5 text-brand-600 font-extrabold text-sm">84% Match</td>
+                                        <td class="p-2.5 sm:p-3.5"><span class="bg-emerald-100 text-emerald-800 text-[11px] px-2.5 py-0.5 rounded-full font-bold">Shortlisted</span></td>
+                                    </tr>
+                                    <tr class="hover:bg-neutral-50/80 cand-row cand-shortlisted">
+                                        <td class="p-2.5 sm:p-3.5 text-neutral-900 font-bold">Layla Nabil</td>
+                                        <td class="p-2.5 sm:p-3.5 table-col-hide-mobile">Fullstack JS, Docker, AWS</td>
+                                        <td class="p-2.5 sm:p-3.5 table-col-hide-mobile">3 Years</td>
+                                        <td class="p-2.5 sm:p-3.5 text-brand-600 font-extrabold text-sm">78% Match</td>
+                                        <td class="p-2.5 sm:p-3.5"><span class="bg-emerald-100 text-emerald-800 text-[11px] px-2.5 py-0.5 rounded-full font-bold">Shortlisted</span></td>
+                                    </tr>
+                                    <tr class="hover:bg-neutral-50/80 cand-row cand-rejected">
+                                        <td class="p-2.5 sm:p-3.5 text-neutral-900 font-bold">Tarek Mahmoud</td>
+                                        <td class="p-2.5 sm:p-3.5 table-col-hide-mobile">PHP, WordPress, MySQL</td>
+                                        <td class="p-2.5 sm:p-3.5 table-col-hide-mobile">2 Years</td>
+                                        <td class="p-2.5 sm:p-3.5 text-rose-500 font-extrabold text-sm">42% Match</td>
+                                        <td class="p-2.5 sm:p-3.5"><span class="bg-rose-100 text-rose-800 text-[11px] px-2.5 py-0.5 rounded-full font-bold">Below Threshold</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STAGE 03: ASSESSMENT SUITE & SCHEDULING -->
+                <div class="flex items-start gap-3.5 sm:gap-6">
+                    <div class="flex flex-col items-center self-stretch shrink-0 pt-1">
+                        <div class="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-brand-600 text-white font-extrabold text-xs sm:text-sm flex items-center justify-center ring-4 ring-brand-100 shadow-sm shrink-0">
+                            03
+                        </div>
+                        <div class="w-0.5 bg-brand-200 flex-1 my-2 rounded-full"></div>
+                    </div>
+                    <div class="flex-1 min-w-0 bg-white rounded-3xl border border-neutral-200 shadow-sm p-4 sm:p-7 space-y-5">
+                        <div class="flex flex-wrap items-center justify-between border-b border-neutral-200 pb-4 gap-2">
+                            <div>
+                                <span class="text-xs font-bold text-brand-600 uppercase tracking-wider block mb-0.5">Stage 03 • Assessments</span>
+                                <h3 class="font-bold text-neutral-900 text-lg sm:text-xl">Tailored Technical Challenges &amp; Candidate Scheduling</h3>
+                                <p class="text-xs text-neutral-500">Practical challenges tailored to seniority levels, paired with direct candidate self-scheduling.</p>
+                            </div>
+                            <span class="bg-brand-50 text-brand-700 text-xs px-3 py-1 rounded-full font-semibold border border-brand-200">
+                                3 Practical Challenges Configured
+                            </span>
+                        </div>
+
+                        <div class="grid md:grid-cols-3 gap-4" id="exam-cards-container">
+                            <div class="p-5 bg-neutral-50 border border-neutral-200 rounded-2xl space-y-2">
+                                <div class="flex items-center justify-between">
+                                    <span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2.5 py-0.5 rounded-full">EASY CHALLENGE</span>
+                                    <span class="text-[11px] text-neutral-400 font-mono">25 Mins</span>
+                                </div>
+                                <h4 class="font-bold text-sm text-neutral-900">Binary Tree In-Order Traversal</h4>
+                                <p class="text-xs text-neutral-500 leading-relaxed">Algorithm fundamentals, memory allocation, and traversal lookup optimization.</p>
+                            </div>
+                            <div class="p-5 bg-neutral-50 border border-neutral-200 rounded-2xl space-y-2">
+                                <div class="flex items-center justify-between">
+                                    <span class="bg-brand-100 text-brand-800 text-[10px] font-bold px-2.5 py-0.5 rounded-full">MEDIUM CHALLENGE</span>
+                                    <span class="text-[11px] text-neutral-400 font-mono">45 Mins</span>
+                                </div>
+                                <h4 class="font-bold text-sm text-neutral-900">Payment Gateway Idempotency</h4>
+                                <p class="text-xs text-neutral-500 leading-relaxed">Handling duplicate client transactions without race conditions in Node.js microservice.</p>
+                            </div>
+                            <div class="p-5 bg-white border-2 border-brand-500 rounded-2xl space-y-2 shadow-sm relative">
+                                <div class="flex items-center justify-between gap-1">
+                                    <span class="bg-brand-600 text-white text-[9.5px] sm:text-[10px] font-bold px-2 sm:px-2.5 py-0.5 rounded-full whitespace-nowrap">ACTIVE FOR ROLE</span>
+                                    <span class="text-[11px] text-neutral-500 font-mono font-bold whitespace-nowrap">60 Mins</span>
+                                </div>
+                                <h4 class="font-bold text-sm text-neutral-900">Distributed Token Bucket Limiter</h4>
+                                <p class="text-xs text-neutral-600 leading-relaxed">Concurrent client locking, atomic counter synchronization, and lazy token refill.</p>
+                            </div>
+                        </div>
+
+                        <div class="bg-neutral-50 p-4 rounded-2xl border border-neutral-200 flex flex-wrap items-center justify-between gap-3 text-xs">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-8 h-8 rounded-full bg-brand-100 text-brand-600 flex items-center justify-center font-bold shrink-0">
+                                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                                </div>
+                                <div>
+                                    <span class="font-bold text-neutral-900 block">Automated Self-Service Slot Booking</span>
+                                    <span class="text-neutral-500">Shortlisted candidates receive private invites to select an exam slot synced with your calendar availability.</span>
+                                </div>
+                            </div>
+                            <span class="text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-200 font-bold text-xs flex items-center gap-1.5">
+                                <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                                Calendar Sync Active
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STAGE 04: EVIDENCE SCORECARD & RADAR CHART -->
+                <div class="flex items-start gap-3.5 sm:gap-6">
+                    <div class="flex flex-col items-center self-stretch shrink-0 pt-1">
+                        <div class="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-brand-600 text-white font-extrabold text-xs sm:text-sm flex items-center justify-center ring-4 ring-brand-100 shadow-sm shrink-0">
+                            04
+                        </div>
+                        <div class="w-0.5 bg-brand-200 flex-1 my-2 rounded-full"></div>
+                    </div>
+                    <div class="flex-1 min-w-0 bg-white rounded-3xl border border-neutral-200 shadow-sm p-4 sm:p-7 space-y-5">
+                        <div class="flex flex-wrap items-center justify-between border-b border-neutral-200 pb-4 gap-2">
+                            <div>
+                                <span class="text-xs font-bold text-brand-600 uppercase tracking-wider block mb-0.5">Stage 04 • Candidate Scorecard</span>
+                                <h3 class="font-bold text-neutral-900 text-lg sm:text-xl">Evidence-Based Candidate Scorecard &amp; Skill Radar</h3>
+                                <p class="text-xs text-neutral-500">Detailed candidate activity and practical skill breakdowns replace unhelpful single scores.</p>
+                            </div>
+                            <span class="text-xs font-bold text-neutral-900 bg-neutral-100 px-3 py-1 rounded-full border border-neutral-200">
+                                Evaluated: Sara Ali (Senior Backend Engineer)
+                            </span>
+                        </div>
+
+                        <div class="grid md:grid-cols-12 gap-6 items-center">
+                            <div class="md:col-span-6 space-y-4">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                                    <div class="p-3.5 bg-emerald-50 border border-emerald-200 rounded-2xl">
+                                        <span class="text-neutral-500 block font-medium">Overall Fit Score</span>
+                                        <span class="text-2xl font-extrabold text-emerald-700">92%</span>
+                                    </div>
+                                    <div class="p-3.5 bg-brand-50 border border-brand-200 rounded-2xl">
+                                        <span class="text-neutral-500 block font-medium">AI Collaboration Quality</span>
+                                        <span class="text-2xl font-extrabold text-brand-700">Superior</span>
+                                    </div>
+                                </div>
+                                <div class="space-y-1 text-xs bg-neutral-50 p-3.5 rounded-xl border border-neutral-200">
+                                    <span class="font-bold text-neutral-900 block">Demonstrated Strengths:</span>
+                                    <p class="text-neutral-600 leading-relaxed">Formulated sharp concurrency questions to AI assistant, actively refactored generated logic, and wrote 100% passing tests.</p>
+                                </div>
+                                <div class="space-y-1 text-xs bg-neutral-50 p-3.5 rounded-xl border border-neutral-200">
+                                    <span class="font-bold text-neutral-900 block">Identified Growth Areas:</span>
+                                    <p class="text-neutral-600 leading-relaxed">Limited deep distributed lock caching under extreme multi-region replication scenarios.</p>
+                                </div>
+                            </div>
+                            <div class="md:col-span-6 flex flex-col items-center">
+                                <div class="chart-container radar-chart-container w-full max-w-full">
+                                    <canvas id="candidateRadarChart"></canvas>
+                                </div>
+                                <!-- Responsive Radar Dimension Breakdown Pills -->
+                                <div class="w-full grid grid-cols-2 sm:grid-cols-3 gap-2 mt-3 pt-3 border-t border-neutral-100 text-xs">
+                                    <div class="p-2 rounded-xl bg-neutral-50 border border-neutral-200/70 flex justify-between items-center">
+                                        <span class="text-neutral-600 text-[11px] font-medium">Problem Solving</span>
+                                        <span class="font-bold text-brand-600 font-mono text-xs">90%</span>
+                                    </div>
+                                    <div class="p-2 rounded-xl bg-neutral-50 border border-neutral-200/70 flex justify-between items-center">
+                                        <span class="text-neutral-600 text-[11px] font-medium">AI Quality</span>
+                                        <span class="font-bold text-brand-600 font-mono text-xs">95%</span>
+                                    </div>
+                                    <div class="p-2 rounded-xl bg-neutral-50 border border-neutral-200/70 flex justify-between items-center">
+                                        <span class="text-neutral-600 text-[11px] font-medium">Code Quality</span>
+                                        <span class="font-bold text-brand-600 font-mono text-xs">88%</span>
+                                    </div>
+                                    <div class="p-2 rounded-xl bg-neutral-50 border border-neutral-200/70 flex justify-between items-center">
+                                        <span class="text-neutral-600 text-[11px] font-medium">Communication</span>
+                                        <span class="font-bold text-brand-600 font-mono text-xs">88%</span>
+                                    </div>
+                                    <div class="p-2 rounded-xl bg-neutral-50 border border-neutral-200/70 flex justify-between items-center col-span-2 sm:col-span-1">
+                                        <span class="text-neutral-600 text-[11px] font-medium">System Design</span>
+                                        <span class="font-bold text-amber-600 font-mono text-xs">76%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STAGE 05: ONE-CLICK DECISION & CANDIDATE EMAILS -->
+                <div class="flex items-start gap-3.5 sm:gap-6">
+                    <div class="flex flex-col items-center self-stretch shrink-0 pt-1">
+                        <div class="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-emerald-600 text-white font-extrabold text-xs sm:text-sm flex items-center justify-center ring-4 ring-emerald-100 shadow-sm shrink-0">
+                            05
+                        </div>
+                    </div>
+                    <div class="flex-1 min-w-0 bg-white rounded-3xl border border-neutral-200 shadow-sm p-4 sm:p-7 space-y-5">
+                        <div class="flex flex-wrap items-center justify-between border-b border-neutral-200 pb-4 gap-2">
+                            <div>
+                                <span class="text-xs font-bold text-emerald-600 uppercase tracking-wider block mb-0.5">Stage 05 • Decision & Offer</span>
+                                <h3 class="font-bold text-neutral-900 text-lg sm:text-xl">One-Click Hiring Decision &amp; Candidate Emails</h3>
+                                <p class="text-xs text-neutral-500">Record final decisions and automatically draft personalized feedback emails tailored to session results.</p>
+                            </div>
+                            <div class="flex flex-wrap step5-actions gap-2 sm:gap-3">
+                                <button type="button" onclick="setCandidateDecision('accepted')" id="decision-accept-btn" class="custom-btn custom-btn-sm custom-btn-primary">
+                                    <span>Accept & Extend Offer</span>
+                                </button>
+                                <button type="button" onclick="setCandidateDecision('declined')" id="decision-decline-btn" class="custom-btn custom-btn-sm custom-btn-ghost border border-rose-300 text-rose-700 hover:bg-rose-50">
+                                    <span>Decline with Feedback</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div id="email-preview-container" class="bg-neutral-50 border border-neutral-200 p-5 rounded-2xl space-y-3">
+                            <!-- Populated dynamically via JS -->
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </section>
 
@@ -863,14 +1189,14 @@
                         </div>
                     </div>
 
-                    <!-- Telemetry Insights -->
+                    <!-- AI Activity Insights -->
                     <div class="pt-3 border-t border-neutral-800 text-neutral-400 text-[11px] space-y-2">
-                        <span class="text-brand-400 font-bold block uppercase tracking-wider text-[10px]">Candidate AI Usage Telemetry:</span>
-                        <div class="flex justify-between items-center bg-neutral-900/60 p-2 rounded-lg border border-neutral-800">
+                        <span class="text-brand-400 font-bold block uppercase tracking-wider text-[10px]">Candidate AI Usage Tracking:</span>
+                        <div class="flex flex-wrap items-center justify-between gap-1 bg-neutral-900/60 p-2 rounded-lg border border-neutral-800">
                             <span>Prompt Precision:</span>
                             <span class="text-emerald-400 font-bold">94% (Superior)</span>
                         </div>
-                        <div class="flex justify-between items-center bg-neutral-900/60 p-2 rounded-lg border border-neutral-800">
+                        <div class="flex flex-wrap items-center justify-between gap-1 bg-neutral-900/60 p-2 rounded-lg border border-neutral-800">
                             <span>Verification Behavior:</span>
                             <span class="text-brand-300 font-bold">High (Validates all logic)</span>
                         </div>
@@ -904,8 +1230,8 @@
                     <div class="w-10 h-10 rounded-xl bg-brand-50 text-brand-600 flex items-center justify-center shrink-0">
                         <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"></path></svg>
                     </div>
-                    <h3 class="font-bold text-neutral-900 text-base">AI-Usage Telemetry &amp; Insights</h3>
-                    <p class="text-xs text-neutral-600 leading-relaxed">Candidates use AI freely; reports measure prompt sharpness, question direction, and refinement rigor.</p>
+                    <h3 class="font-bold text-neutral-900 text-base">AI Usage Tracking &amp; Insights</h3>
+                    <p class="text-xs text-neutral-600 leading-relaxed">Candidates use AI freely; reports measure prompt quality, problem-solving direction, and verification habits.</p>
                 </div>
 
                 <!-- Card 3 -->
@@ -922,7 +1248,7 @@
                     <div class="w-10 h-10 rounded-xl bg-brand-50 text-brand-600 flex items-center justify-center shrink-0">
                         <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
                     </div>
-                    <h3 class="font-bold text-neutral-900 text-base">Custom Intake Form Builder</h3>
+                    <h3 class="font-bold text-neutral-900 text-base">Custom Application Form Builder</h3>
                     <p class="text-xs text-neutral-600 leading-relaxed">Build custom application forms with technology selectors and open-ended architecture questions.</p>
                 </div>
 
@@ -940,7 +1266,7 @@
                     <div class="w-10 h-10 rounded-xl bg-brand-50 text-brand-600 flex items-center justify-center shrink-0">
                         <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path><polyline points="22,6 12,13 2,6"></polyline></svg>
                     </div>
-                    <h3 class="font-bold text-neutral-900 text-base">Automated Personalized Comms</h3>
+                    <h3 class="font-bold text-neutral-900 text-base">Automated Candidate Feedback Emails</h3>
                     <p class="text-xs text-neutral-600 leading-relaxed">Auto-drafted personalized feedback emails ready for one-click review, maintaining positive employer brand.</p>
                 </div>
             </div>
@@ -984,14 +1310,14 @@
                     </div>
 
                     <!-- Calculated KPI Cards -->
-                    <div class="grid grid-cols-2 gap-3 sm:gap-4 pt-4 border-t border-neutral-200">
-                        <div class="bg-white p-3 sm:p-4 rounded-xl border border-neutral-200 text-center shadow-sm">
-                            <span class="text-[11px] sm:text-xs text-neutral-500 font-medium block">Monthly Hours Saved</span>
-                            <span id="res-hours-saved" class="text-xl sm:text-2xl font-extrabold text-brand-600">140 hrs</span>
+                    <div class="grid grid-cols-2 gap-2 sm:gap-4 pt-4 border-t border-neutral-200">
+                        <div class="bg-white p-2.5 sm:p-4 rounded-xl border border-neutral-200 text-center shadow-sm">
+                            <span class="text-[10px] sm:text-xs text-neutral-500 font-medium block leading-tight">Monthly Hours Saved</span>
+                            <span id="res-hours-saved" class="text-lg sm:text-2xl font-extrabold text-brand-600 block mt-0.5">140 hrs</span>
                         </div>
-                        <div class="bg-white p-3 sm:p-4 rounded-xl border border-neutral-200 text-center shadow-sm">
-                            <span class="text-[11px] sm:text-xs text-neutral-500 font-medium block">Est. Cost Savings</span>
-                            <span id="res-cost-saved" class="text-xl sm:text-2xl font-extrabold text-emerald-600">$6,300</span>
+                        <div class="bg-white p-2.5 sm:p-4 rounded-xl border border-neutral-200 text-center shadow-sm">
+                            <span class="text-[10px] sm:text-xs text-neutral-500 font-medium block leading-tight">Est. Cost Savings</span>
+                            <span id="res-cost-saved" class="text-lg sm:text-2xl font-extrabold text-emerald-600 block mt-0.5">$6,300</span>
                         </div>
                     </div>
                 </div>
@@ -1012,11 +1338,11 @@
                 <span class="text-brand-600 font-bold text-xs uppercase tracking-widest">Target Alignment</span>
                 <h2 class="text-2xl sm:text-3xl font-extrabold text-neutral-900">Tailored for Technical Hiring Leaders</h2>
                 <p class="text-neutral-600 text-sm sm:text-base">
-                    Aligning recruiters, engineering managers, and executive CTOs around unified, defensible hiring standards.
+                    Aligning recruiters, engineering managers, and executive CTOs around unified, reliable hiring standards.
                 </p>
             </div>
 
-            <div class="grid sm:grid-cols-2 md:grid-cols-3 gap-5 sm:gap-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-6">
                 <!-- Persona 1: HR Admin -->
                 <div class="bg-white p-6 sm:p-7 rounded-2xl border border-neutral-200 shadow-sm hover:border-brand-300 transition space-y-4 flex flex-col">
                     <div class="flex flex-col items-center sm:items-start text-center sm:text-left space-y-3">
@@ -1046,7 +1372,7 @@
 
                 <!-- Persona 2: Engineering Managers -->
                 <div class="bg-white p-6 sm:p-7 rounded-2xl border-2 border-brand-500 shadow-md relative hover:border-brand-600 transition space-y-4 flex flex-col">
-                    <span class="absolute -top-3 left-1/2 -translate-x-1/2 sm:left-auto sm:translate-x-0 sm:right-5 bg-brand-600 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+                    <span class="absolute -top-3 left-1/2 -translate-x-1/2 md:left-auto md:translate-x-0 md:right-5 bg-brand-600 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">
                         Core Evaluator
                     </span>
                     <div class="flex flex-col items-center sm:items-start text-center sm:text-left space-y-3">
@@ -1065,7 +1391,7 @@
                         </li>
                         <li class="flex items-center space-x-2">
                             <span class="text-emerald-600 font-bold">✓</span>
-                            <span>Full prompt history &amp; reasoning telemetry</span>
+                            <span>Full prompt history &amp; problem-solving activity</span>
                         </li>
                         <li class="flex items-center space-x-2">
                             <span class="text-emerald-600 font-bold">✓</span>
@@ -1082,7 +1408,7 @@
                         </div>
                         <h3 class="text-lg font-bold text-neutral-900">CTOs &amp; Tech Executives</h3>
                         <p class="text-xs text-neutral-600 leading-relaxed">
-                            Standardize technical hiring standards across engineering hubs with defensible, audit-ready reports that withstand executive scrutiny.
+                            Standardize technical hiring standards across engineering hubs with verified, clear reports that give leaders total confidence.
                         </p>
                     </div>
                     <ul class="space-y-2 text-xs text-neutral-700 pt-4 border-t border-neutral-100 mt-auto persona-card-ul">
@@ -1092,11 +1418,11 @@
                         </li>
                         <li class="flex items-center space-x-2">
                             <span class="text-emerald-600 font-bold">✓</span>
-                            <span>Calibrated hiring rubrics for Egypt &amp; GCC</span>
+                            <span>Standardized hiring benchmarks for Egypt &amp; GCC</span>
                         </li>
                         <li class="flex items-center space-x-2">
                             <span class="text-emerald-600 font-bold">✓</span>
-                            <span>Defensible candidate assessment data</span>
+                            <span>Clear, verified candidate skill data</span>
                         </li>
                     </ul>
                 </div>
@@ -1120,7 +1446,7 @@
                     </svg>
                 </button>
             </div>
-            <div class="text-xs text-neutral-500 pt-8 border-t border-neutral-800/80">
+            <div class="text-[11px] sm:text-xs text-neutral-500 pt-8 border-t border-neutral-800/80 leading-relaxed max-w-xl mx-auto">
                 HirQo © 2026 • AI-Native Technical Talent Assessment Platform • Built for Egypt & GCC Engineering Teams
             </div>
         </footer>
@@ -1129,7 +1455,7 @@
 
     <!-- WALKTHROUGH DEMO MODAL -->
     <div id="walkthrough-modal" class="fixed inset-0 bg-neutral-950/70 backdrop-blur-sm z-50 flex items-center justify-center hidden p-3 sm:p-4" onclick="handleBackdropClick(event)">
-        <div class="bg-white rounded-3xl max-w-md w-full p-5 sm:p-8 space-y-5 sm:space-y-6 shadow-2xl border border-neutral-200 relative max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
+        <div class="bg-white rounded-3xl max-w-md w-full p-5 sm:p-8 space-y-5 sm:space-y-6 shadow-2xl border border-neutral-200 relative max-h-[88vh] sm:max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
             <!-- Close Button -->
             <button onclick="closeModal()" class="absolute top-5 right-5 text-neutral-400 hover:text-neutral-700 text-sm w-8 h-8 rounded-full flex items-center justify-center hover:bg-neutral-100 transition">
                 ✕
@@ -1147,20 +1473,20 @@
                 <input type="hidden" name="_subject" value="New HirQo Walkthrough Demonstration Request">
                 <div>
                     <label class="block text-xs font-semibold text-neutral-700 mb-1">Full Name <span class="text-rose-500">*</span></label>
-                    <input type="text" name="fullName" required  class="w-full text-sm px-3.5 py-2 border border-neutral-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition">
+                    <input type="text" name="fullName" required class="w-full text-base sm:text-sm px-3.5 py-2 border border-neutral-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition">
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-neutral-700 mb-1">Work Email <span class="text-rose-500">*</span></label>
-                    <input type="email" name="email" required class="w-full text-sm px-3.5 py-2 border border-neutral-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition">
+                    <input type="email" name="email" required class="w-full text-base sm:text-sm px-3.5 py-2 border border-neutral-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition">
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
                         <label class="block text-xs font-semibold text-neutral-700 mb-1">Company & Hub</label>
-                        <input type="text" name="company" placeholder="e.g. TechCorp (Cairo)" class="w-full text-sm px-3.5 py-2 border border-neutral-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition">
+                        <input type="text" name="company" placeholder="e.g. TechCorp (Cairo)" class="w-full text-base sm:text-sm px-3.5 py-2 border border-neutral-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition">
                     </div>
                     <div>
                         <label class="block text-xs font-semibold text-neutral-700 mb-1">Your Role</label>
-                        <select name="role" class="w-full text-sm px-3.5 py-2 border border-neutral-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition bg-white">
+                        <select name="role" class="w-full text-base sm:text-sm px-3.5 py-2 border border-neutral-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition bg-white">
                             <option value="HR Manager / Technical Recruiter">HR / Technical Recruiter</option>
                             <option value="Engineering Manager / Tech Lead">Engineering Manager</option>
                             <option value="CTO / VP of Engineering">CTO / VP of Engineering</option>
@@ -1170,7 +1496,7 @@
                 </div>
                 <div>
                     <label class="block text-xs font-semibold text-neutral-700 mb-1">Additional Notes or Hiring Needs <span class="text-neutral-400 font-normal">(Optional)</span></label>
-                    <textarea name="notes" rows="2" class="w-full text-sm px-3.5 py-2 border border-neutral-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition resize-none"></textarea>
+                    <textarea name="notes" rows="2" class="w-full text-base sm:text-sm px-3.5 py-2 border border-neutral-300 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition resize-none"></textarea>
                 </div>
                 <button type="submit" id="modal-submit-btn" class="w-full custom-btn custom-btn-primary custom-btn-md justify-center">
                     <span>Submit Demonstration Request</span>
@@ -1200,15 +1526,15 @@
         let dilemmaChartInstance = null;
         let roiChartInstance = null;
         let candidateRadarChartInstance = null;
-        let currentWorkflowStep = 0;
         let currentCandidateDecision = 'pending';
         let examRegenCount = 0;
+        let currentDilemmaMode = 'hirqo';
 
         // Dilemma Data
         const dilemmaData = {
             traditional: {
-                title: "The Traditional Hiring Paradigm",
-                badge: "High Risk • Obsolete in AI Era",
+                title: "Traditional Technical Hiring",
+                badge: "High Risk • Outdated in AI Era",
                 badgeClass: "bg-rose-50 text-rose-700 border border-rose-200",
                 points: [
                     {
@@ -1220,14 +1546,14 @@
                         desc: "Standard assessments present textbook algorithm questions that candidates easily solve using ChatGPT without real understanding."
                     },
                     {
-                        title: "Black-Box Opaque Percentages",
-                        desc: "Teams receive an unexplainable single percentage score with zero visibility into code hygiene or architectural reasoning."
+                        title: "Unclear Single Percentage Scores",
+                        desc: "Teams receive an unhelpful single percentage score with zero visibility into code quality or architectural reasoning."
                     }
                 ]
             },
             hirqo: {
                 title: "The HirQo AI-Native Way",
-                badge: "Evidence-Based • Defensible Signal",
+                badge: "Evidence-Based • Verified Skill Proof",
                 badgeClass: "bg-brand-50 text-brand-700 border border-brand-200",
                 points: [
                     {
@@ -1240,7 +1566,7 @@
                     },
                     {
                         title: "Evidence-Based Scorecards",
-                        desc: "Every conclusion is backed by concrete session telemetry: code diffs, unit test results, and reasoning logs."
+                        desc: "Every conclusion is backed by real session evidence: code diffs, unit test results, and reasoning logs."
                     }
                 ]
             }
@@ -1248,16 +1574,17 @@
 
         // Switch Dilemma Mode
         function setDilemmaMode(mode) {
+            currentDilemmaMode = mode;
             const content = document.getElementById('dilemma-content');
             const btnTrad = document.getElementById('btn-traditional');
             const btnHirqo = document.getElementById('btn-hirqo');
 
             if (mode === 'traditional') {
-                btnTrad.className = "custom-btn custom-btn-sm rounded-full bg-white text-neutral-900 shadow-sm font-semibold transition text-xs sm:text-sm px-3 sm:px-4 py-1.5 flex-1 justify-center";
-                btnHirqo.className = "custom-btn custom-btn-sm rounded-full text-neutral-600 hover:text-neutral-900 font-semibold transition text-xs sm:text-sm px-3 sm:px-4 py-1.5 flex-1 justify-center";
+                btnTrad.className = "custom-btn custom-btn-sm rounded-full bg-white text-neutral-900 shadow-sm font-semibold transition text-xs sm:text-sm px-2.5 sm:px-4 py-1.5 flex-1 justify-center";
+                btnHirqo.className = "custom-btn custom-btn-sm rounded-full text-neutral-600 hover:text-neutral-900 font-semibold transition text-xs sm:text-sm px-2.5 sm:px-4 py-1.5 flex-1 justify-center";
             } else {
-                btnHirqo.className = "custom-btn custom-btn-sm rounded-full bg-brand-600 text-white shadow-sm font-semibold transition text-xs sm:text-sm px-3 sm:px-4 py-1.5 flex-1 justify-center";
-                btnTrad.className = "custom-btn custom-btn-sm rounded-full text-neutral-600 hover:text-neutral-900 font-semibold transition text-xs sm:text-sm px-3 sm:px-4 py-1.5 flex-1 justify-center";
+                btnHirqo.className = "custom-btn custom-btn-sm rounded-full bg-brand-600 text-white shadow-sm font-semibold transition text-xs sm:text-sm px-2.5 sm:px-4 py-1.5 flex-1 justify-center";
+                btnTrad.className = "custom-btn custom-btn-sm rounded-full text-neutral-600 hover:text-neutral-900 font-semibold transition text-xs sm:text-sm px-2.5 sm:px-4 py-1.5 flex-1 justify-center";
             }
 
             const data = dilemmaData[mode];
@@ -1281,10 +1608,12 @@
 
         // Update Dilemma Chart
         function updateDilemmaChart(mode) {
-            const ctx = document.getElementById('dilemmaChart').getContext('2d');
+            const canvas = document.getElementById('dilemmaChart');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
             
             const dataConfig = mode === 'traditional' ? {
-                labels: ['Real Skill Signal', 'Cheating & AI Risk', 'Opaque Guesswork'],
+                labels: ['Real Skill Proof', 'AI Cheating Risk', 'Unclear Guesswork'],
                 datasets: [{
                     data: [25, 45, 30],
                     backgroundColor: ['#94a3b8', '#f43f5e', '#f59e0b'],
@@ -1292,7 +1621,7 @@
                     borderColor: '#ffffff'
                 }]
             } : {
-                labels: ['Real Skill Signal', 'AI Collaboration Insight', 'Verified Code Quality'],
+                labels: ['Real Skill Proof', 'AI Collaboration Skill', 'Verified Code Quality'],
                 datasets: [{
                     data: [50, 30, 20],
                     backgroundColor: ['#2563eb', '#10b981', '#0ea5e9'],
@@ -1305,384 +1634,32 @@
                 dilemmaChartInstance.destroy();
             }
 
+            const isSmall = window.innerWidth < 480;
             dilemmaChartInstance = new Chart(ctx, {
                 type: 'doughnut',
                 data: dataConfig,
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    layout: {
+                        padding: isSmall ? 4 : 8
+                    },
                     plugins: {
-                        legend: { position: 'bottom', labels: { font: { family: 'Outfit', size: 12 } } },
+                        legend: { 
+                            position: 'bottom', 
+                            labels: { 
+                                font: { family: 'Outfit', size: isSmall ? 10.5 : 12 },
+                                boxWidth: isSmall ? 10 : 14,
+                                padding: isSmall ? 8 : 12
+                            } 
+                        },
                         tooltip: { enabled: true }
                     }
                 }
             });
         }
 
-        // HR Workflow Stepper Renderer
-        function renderWorkflowStep(step) {
-            currentWorkflowStep = step;
-            const panel = document.getElementById('workflow-panel');
-            
-            for (let i = 0; i <= 5; i++) {
-                const tab = document.getElementById(`step-tab-${i}`);
-                if (tab) {
-                    if (i === step) {
-                        tab.className = "custom-btn custom-btn-sm custom-btn-primary whitespace-nowrap shrink-0 text-xs sm:text-sm";
-                    } else {
-                        tab.className = "custom-btn custom-btn-sm custom-btn-ghost border border-neutral-200 whitespace-nowrap shrink-0 text-xs sm:text-sm";
-                    }
-                }
-            }
-
-            if (step === 0) {
-                // STEP 0: HR Dashboard Overview (matches Dashboard.tsx in web application!)
-                panel.innerHTML = `
-                    <div class="space-y-6">
-                        <div class="flex flex-wrap items-center justify-between border-b border-neutral-200 pb-4 gap-2">
-                            <div>
-                                <h3 class="font-bold text-neutral-900 text-lg">Recruiter & Hiring Overview Dashboard</h3>
-                                <p class="text-xs text-neutral-500">Real-time status of active roles, pending candidate evaluations, and immediate priorities.</p>
-                            </div>
-                            <span class="bg-brand-50 text-brand-700 text-[11px] sm:text-xs px-2.5 py-1 rounded-full font-semibold border border-brand-200">
-                                Active Workspace: Abanoub Amir
-                            </span>
-                        </div>
-                        
-                        <!-- 4 Stat Metric Cards (Directly matching HirQo Dashboard spec) -->
-                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                            <div class="bg-neutral-50 p-4 rounded-2xl border border-neutral-200 space-y-1">
-                                <span class="text-xs text-neutral-500 font-medium block">Active Job Openings</span>
-                                <span class="text-2xl font-extrabold text-neutral-900">2 Roles</span>
-                            </div>
-                            <div class="bg-neutral-50 p-4 rounded-2xl border border-neutral-200 space-y-1">
-                                <span class="text-xs text-neutral-500 font-medium block">Pending Evaluations</span>
-                                <span class="text-2xl font-extrabold text-amber-600">4 Candidates</span>
-                            </div>
-                            <div class="bg-neutral-50 p-4 rounded-2xl border border-neutral-200 space-y-1">
-                                <span class="text-xs text-neutral-500 font-medium block">Candidates This Month</span>
-                                <span class="text-2xl font-extrabold text-brand-600">10 Applicants</span>
-                            </div>
-                            <div class="bg-neutral-50 p-4 rounded-2xl border border-neutral-200 space-y-1">
-                                <span class="text-xs text-neutral-500 font-medium block">Acceptance Rate</span>
-                                <span class="text-2xl font-extrabold text-emerald-600">20%</span>
-                            </div>
-                        </div>
-
-                        <!-- Priority Actions & Recent Activity (from HirQo Dashboard) -->
-                        <div class="grid md:grid-cols-2 gap-6 pt-2">
-                            <div class="bg-white p-5 rounded-2xl border border-neutral-200 space-y-3">
-                                <span class="text-xs font-bold text-neutral-800 uppercase tracking-wider block border-b border-neutral-100 pb-2 flex items-center justify-between">
-                                    <span>Priority Actions Needed</span>
-                                    <span class="bg-amber-100 text-amber-800 text-[10px] px-2 py-0.5 rounded-full font-bold">Action Required</span>
-                                </span>
-                                <div class="space-y-2 text-xs">
-                                    <div class="p-3 bg-amber-50/80 rounded-xl border border-amber-200 flex justify-between items-center gap-2">
-                                        <span class="text-neutral-800 font-medium text-xs">Exams needing challenge generation</span>
-                                        <span class="font-bold text-amber-800 bg-amber-200/60 px-2 py-0.5 rounded text-[11px] shrink-0">1 candidate</span>
-                                    </div>
-                                    <div class="p-3 bg-neutral-50 rounded-xl border border-neutral-200 flex justify-between items-center gap-2">
-                                        <span class="text-neutral-700 font-medium text-xs">Exams missing scheduled time slot</span>
-                                        <span class="font-bold text-neutral-700 bg-neutral-200 px-2 py-0.5 rounded text-[11px] shrink-0">1 candidate</span>
-                                    </div>
-                                    <div class="p-3 bg-brand-50/70 rounded-xl border border-brand-200 flex justify-between items-center gap-2">
-                                        <span class="text-brand-900 font-medium text-xs">Upcoming assessments awaiting slot confirmation</span>
-                                        <span class="font-bold text-brand-700 bg-brand-100 px-2 py-0.5 rounded text-[11px] shrink-0">3 candidates</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="bg-white p-5 rounded-2xl border border-neutral-200 space-y-3">
-                                <span class="text-xs font-bold text-neutral-800 uppercase tracking-wider block border-b border-neutral-100 pb-2">Recent Activity Feed</span>
-                                <div class="space-y-2 text-xs">
-                                    <div class="p-2.5 bg-neutral-50 rounded-xl border border-neutral-100 flex justify-between items-center">
-                                        <span class="font-medium text-neutral-800">David Kim accepted for Sr. Frontend Engineer</span>
-                                        <span class="text-neutral-400 text-[11px]">2h ago</span>
-                                    </div>
-                                    <div class="p-2.5 bg-neutral-50 rounded-xl border border-neutral-100 flex justify-between items-center">
-                                        <span class="font-medium text-neutral-800">3 new applications received for Backend Role</span>
-                                        <span class="text-neutral-400 text-[11px]">4h ago</span>
-                                    </div>
-                                    <div class="p-2.5 bg-neutral-50 rounded-xl border border-neutral-100 flex justify-between items-center">
-                                        <span class="font-medium text-neutral-800">Sara Ali finished Token Bucket Limiter exam</span>
-                                        <span class="text-neutral-400 text-[11px]">6h ago</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            } else if (step === 1) {
-                // STEP 1: Role Creation & Intake Form Builder
-                panel.innerHTML = `
-                    <div class="space-y-5">
-                        <div class="flex flex-wrap items-center justify-between border-b border-neutral-200 pb-4 gap-2">
-                            <div>
-                                <h3 class="font-bold text-neutral-900 text-lg">Step 1: Role Creation & Candidate Intake Form</h3>
-                                <p class="text-xs text-neutral-500">Configure role requirements, custom technical screening questions, and published candidate intake forms.</p>
-                            </div>
-                            <span class="bg-brand-50 text-brand-700 text-xs px-3 py-1 rounded-full font-semibold border border-brand-200">
-                                Position: Senior Backend Engineer
-                            </span>
-                        </div>
-                        <div class="grid md:grid-cols-2 gap-6">
-                            <!-- Left: Form Builder Configuration -->
-                            <div class="bg-neutral-50 p-5 rounded-2xl border border-neutral-200 space-y-3">
-                                <span class="text-xs font-bold text-neutral-800 uppercase tracking-wider block">Configured Application Fields</span>
-                                <div class="space-y-2 text-xs">
-                                    <div class="p-3 bg-white rounded-xl border border-neutral-200 flex justify-between items-center shadow-sm">
-                                        <div>
-                                            <span class="font-semibold text-neutral-900 block">Personal Profile & Resume CV</span>
-                                            <span class="text-neutral-500 text-[11px]">Full name, email, phone, and PDF/Word resume upload</span>
-                                        </div>
-                                        <span class="text-emerald-700 font-bold bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">Required</span>
-                                    </div>
-                                    <div class="p-3 bg-white rounded-xl border border-neutral-200 flex justify-between items-center shadow-sm">
-                                        <div>
-                                            <span class="font-semibold text-neutral-900 block">Required Tech Stack Skills</span>
-                                            <span class="text-neutral-500 text-[11px]">Node.js, TypeScript, PostgreSQL, Redis, Docker</span>
-                                        </div>
-                                        <span class="text-emerald-700 font-bold bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">Required</span>
-                                    </div>
-                                    <div class="p-3 bg-white rounded-xl border border-neutral-200 flex justify-between items-center shadow-sm">
-                                        <div>
-                                            <span class="font-semibold text-neutral-900 block">GitHub & Portfolio Links</span>
-                                            <span class="text-neutral-500 text-[11px]">Open source contributions and production project references</span>
-                                        </div>
-                                        <span class="text-neutral-500 bg-neutral-100 px-2.5 py-0.5 rounded-full">Optional</span>
-                                    </div>
-                                    <div class="p-3 bg-white rounded-xl border border-neutral-200 flex justify-between items-center shadow-sm">
-                                        <div>
-                                            <span class="font-semibold text-neutral-900 block">Custom Architecture Question</span>
-                                            <span class="text-neutral-500 text-[11px]">"Explain how you design idempotent APIs under concurrent load"</span>
-                                        </div>
-                                        <span class="text-emerald-700 font-bold bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">Required</span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Right: Published Application Form Preview -->
-                            <div class="bg-white p-5 rounded-2xl border border-neutral-200 shadow-sm space-y-4 flex flex-col justify-between">
-                                <div class="space-y-3">
-                                    <div class="flex items-center justify-between border-b border-neutral-100 pb-3">
-                                        <span class="text-xs font-bold text-neutral-800 uppercase tracking-wider">Candidate Intake Form Preview</span>
-                                        <span class="text-[11px] bg-emerald-50 text-emerald-700 font-semibold px-2.5 py-0.5 rounded-full border border-emerald-200">● Live & Accepting</span>
-                                    </div>
-                                    <div class="space-y-2 text-xs">
-                                        <div class="p-3 bg-neutral-50 rounded-xl border border-neutral-100 space-y-1.5">
-                                            <div class="flex items-center justify-between">
-                                                <span class="text-neutral-500 text-[10.5px] uppercase font-bold tracking-wider">Application Pipeline Status</span>
-                                                <span class="text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full font-bold text-[10px] border border-emerald-200">Active Intake</span>
-                                            </div>
-                                            <p class="text-neutral-700 text-xs font-medium">Public applicant intake is active — candidate applications directly sync with your recruitment board.</p>
-                                        </div>
-                                        <div class="p-3 bg-neutral-50 rounded-xl border border-neutral-100 space-y-1">
-                                            <span class="text-neutral-400 text-[10px] uppercase font-bold tracking-wider block">Intake Automation Pipeline</span>
-                                            <p class="text-neutral-600 text-[11.5px] leading-relaxed">Incoming candidate submissions automatically trigger Step 2: Instant AI CV screening & match scoring against role requirements.</p>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="p-3 bg-brand-50/60 rounded-xl border border-brand-100 text-xs text-brand-800 flex items-center gap-2">
-                                    <svg class="w-4 h-4 text-brand-600 flex-shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>
-                                    <span>Built-in verification safeguards against spam and low-relevance submissions.</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-            } else if (step === 2) {
-                // STEP 2: AI CV Screening & Ranking
-                panel.innerHTML = `
-                    <div class="space-y-4">
-                        <div class="flex flex-wrap items-center justify-between border-b border-neutral-200 pb-4 gap-2">
-                            <div>
-                                <h3 class="font-bold text-neutral-900 text-lg">Step 2: Automated AI CV Screening & Ranking</h3>
-                                <p class="text-xs text-neutral-500">Applicant resumes are scored automatically against role requirements and technical depth.</p>
-                            </div>
-                            <div class="flex flex-wrap items-center gap-2">
-                                <button onclick="filterCandidates('all')" id="filter-all" class="custom-btn custom-btn-sm custom-btn-primary text-xs sm:text-sm px-3 py-1.5">All (4)</button>
-                                <button onclick="filterCandidates('shortlisted')" id="filter-shortlisted" class="custom-btn custom-btn-sm custom-btn-ghost border border-neutral-200 text-xs sm:text-sm px-3 py-1.5">Shortlisted (3)</button>
-                                <button onclick="filterCandidates('rejected')" id="filter-rejected" class="custom-btn custom-btn-sm custom-btn-ghost border border-neutral-200 text-xs sm:text-sm px-3 py-1.5">Rejected (1)</button>
-                            </div>
-                        </div>
-                        <div class="overflow-x-auto rounded-2xl border border-neutral-200">
-                            <table class="w-full text-left text-xs cv-table">
-                                <thead class="bg-neutral-50 text-neutral-500 uppercase font-semibold border-b border-neutral-200">
-                                    <tr>
-                                        <th class="p-2 sm:p-3.5">Candidate Name</th>
-                                        <th class="p-2 sm:p-3.5 table-col-hide-mobile">Primary Tech Stack</th>
-                                        <th class="p-2 sm:p-3.5 table-col-hide-mobile">Experience</th>
-                                        <th class="p-2 sm:p-3.5">Match Score</th>
-                                        <th class="p-2 sm:p-3.5">Recommendation</th>
-                                    </tr>
-                                </thead>
-                                <tbody class="divide-y divide-neutral-100 font-medium" id="candidates-table-body">
-                                    <tr class="hover:bg-neutral-50/80 cand-row cand-shortlisted">
-                                        <td class="p-2 sm:p-3.5 text-neutral-900 font-bold">Sara Ali</td>
-                                        <td class="p-2 sm:p-3.5 table-col-hide-mobile">TypeScript, Node.js, PostgreSQL</td>
-                                        <td class="p-2 sm:p-3.5 table-col-hide-mobile">5 Years</td>
-                                        <td class="p-2 sm:p-3.5 text-emerald-600 font-extrabold text-sm">92% Match</td>
-                                        <td class="p-2 sm:p-3.5"><span class="bg-emerald-100 text-emerald-800 text-[11px] px-2 py-0.5 rounded-full font-bold">Shortlisted</span></td>
-                                    </tr>
-                                    <tr class="hover:bg-neutral-50/80 cand-row cand-shortlisted">
-                                        <td class="p-2 sm:p-3.5 text-neutral-900 font-bold">Omar Hassan</td>
-                                        <td class="p-2 sm:p-3.5 table-col-hide-mobile">Node.js, Redis, Concurrency</td>
-                                        <td class="p-2 sm:p-3.5 table-col-hide-mobile">4 Years</td>
-                                        <td class="p-2 sm:p-3.5 text-brand-600 font-extrabold text-sm">84% Match</td>
-                                        <td class="p-2 sm:p-3.5"><span class="bg-emerald-100 text-emerald-800 text-[11px] px-2 py-0.5 rounded-full font-bold">Shortlisted</span></td>
-                                    </tr>
-                                    <tr class="hover:bg-neutral-50/80 cand-row cand-shortlisted">
-                                        <td class="p-2 sm:p-3.5 text-neutral-900 font-bold">Layla Nabil</td>
-                                        <td class="p-2 sm:p-3.5 table-col-hide-mobile">Fullstack JS, Docker, AWS</td>
-                                        <td class="p-2 sm:p-3.5 table-col-hide-mobile">3 Years</td>
-                                        <td class="p-2 sm:p-3.5 text-brand-600 font-extrabold text-sm">78% Match</td>
-                                        <td class="p-2 sm:p-3.5"><span class="bg-emerald-100 text-emerald-800 text-[11px] px-2 py-0.5 rounded-full font-bold">Shortlisted</span></td>
-                                    </tr>
-                                    <tr class="hover:bg-neutral-50/80 cand-row cand-rejected">
-                                        <td class="p-2 sm:p-3.5 text-neutral-900 font-bold">Tarek Mahmoud</td>
-                                        <td class="p-2 sm:p-3.5 table-col-hide-mobile">PHP, WordPress, MySQL</td>
-                                        <td class="p-2 sm:p-3.5 table-col-hide-mobile">2 Years</td>
-                                        <td class="p-2 sm:p-3.5 text-rose-500 font-extrabold text-sm">42% Match</td>
-                                        <td class="p-2 sm:p-3.5"><span class="bg-rose-100 text-rose-800 text-[11px] px-2 py-0.5 rounded-full font-bold">Below Threshold</span></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                `;
-            } else if (step === 3) {
-                // STEP 3: Assessment Suite & Scheduling
-                panel.innerHTML = `
-                    <div class="space-y-5">
-                        <div class="flex flex-wrap items-center justify-between border-b border-neutral-200 pb-4 gap-2">
-                            <div>
-                                <h3 class="font-bold text-neutral-900 text-lg">Step 3: Calibrated Assessment Suite & Candidate Slot Booking</h3>
-                                <p class="text-xs text-neutral-500">Challenges calibrated by difficulty tier, paired with self-service candidate scheduling.</p>
-                            </div>
-                            <span class="bg-brand-50 text-brand-700 text-xs px-3 py-1 rounded-full font-semibold border border-brand-200">
-                                3 Calibrated Challenges Configured
-                            </span>
-                        </div>
-                        <div class="grid md:grid-cols-3 gap-4" id="exam-cards-container">
-                            <div class="p-5 bg-neutral-50 border border-neutral-200 rounded-2xl space-y-2">
-                                <div class="flex items-center justify-between">
-                                    <span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2.5 py-0.5 rounded-full">EASY CHALLENGE</span>
-                                    <span class="text-[11px] text-neutral-400 font-mono">25 Mins</span>
-                                </div>
-                                <h4 class="font-bold text-sm text-neutral-900">Binary Tree In-Order Traversal</h4>
-                                <p class="text-xs text-neutral-500 leading-relaxed">Algorithm fundamentals, memory allocation, and traversal lookup optimization.</p>
-                            </div>
-                            <div class="p-5 bg-neutral-50 border border-neutral-200 rounded-2xl space-y-2">
-                                <div class="flex items-center justify-between">
-                                    <span class="bg-brand-100 text-brand-800 text-[10px] font-bold px-2.5 py-0.5 rounded-full">MEDIUM CHALLENGE</span>
-                                    <span class="text-[11px] text-neutral-400 font-mono">45 Mins</span>
-                                </div>
-                                <h4 class="font-bold text-sm text-neutral-900">Payment Gateway Idempotency</h4>
-                                <p class="text-xs text-neutral-500 leading-relaxed">Handling duplicate client transactions without race conditions in Node.js microservice.</p>
-                            </div>
-                            <div class="p-5 bg-white border-2 border-brand-500 rounded-2xl space-y-2 shadow-sm relative">
-                                <div class="flex items-center justify-between">
-                                    <span class="bg-brand-600 text-white text-[10px] font-bold px-2.5 py-0.5 rounded-full">ACTIVE FOR ROLE</span>
-                                    <span class="text-[11px] text-neutral-500 font-mono font-bold">60 Mins</span>
-                                </div>
-                                <h4 class="font-bold text-sm text-neutral-900">Distributed Token Bucket Limiter</h4>
-                                <p class="text-xs text-neutral-600 leading-relaxed">Concurrent client locking, atomic counter synchronization, and lazy token refill.</p>
-                            </div>
-                        </div>
-                        <div class="bg-neutral-50 p-4 rounded-2xl border border-neutral-200 flex flex-wrap items-center justify-between gap-3 text-xs">
-                            <div class="flex items-center space-x-3">
-                                <div class="w-8 h-8 rounded-full bg-brand-100 text-brand-600 flex items-center justify-center font-bold">
-                                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                                </div>
-                                <div>
-                                    <span class="font-bold text-neutral-900 block">Automated Self-Service Slot Booking</span>
-                                    <span class="text-neutral-500">Shortlisted candidates receive private invites to select an exam slot synced with your calendar availability.</span>
-                                </div>
-                            </div>
-                            <span class="text-emerald-700 bg-emerald-50 px-3 py-1.5 rounded-full border border-emerald-200 font-bold text-xs flex items-center gap-1.5">
-                                <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                                Calendar Sync Active
-                            </span>
-                        </div>
-                    </div>
-                `;
-            } else if (step === 4) {
-                // STEP 4: Evidence Candidate Report
-                panel.innerHTML = `
-                    <div class="space-y-5">
-                        <div class="flex flex-wrap items-center justify-between border-b border-neutral-200 pb-4 gap-2">
-                            <div>
-                                <h3 class="font-bold text-neutral-900 text-lg">Step 4: Evidence-Based Candidate Scorecard</h3>
-                                <p class="text-xs text-neutral-500">Session telemetry and qualitative analysis replace black-box opaque percentage scores.</p>
-                            </div>
-                            <span class="text-xs font-bold text-neutral-900 bg-neutral-100 px-3 py-1 rounded-full border border-neutral-200">
-                                Evaluated: Sara Ali (Senior Backend Engineer)
-                            </span>
-                        </div>
-                        <div class="grid md:grid-cols-12 gap-6 items-center">
-                            <div class="md:col-span-6 space-y-4">
-                                <div class="grid grid-cols-2 gap-3 text-xs">
-                                    <div class="p-3.5 bg-emerald-50 border border-emerald-200 rounded-2xl">
-                                        <span class="text-neutral-500 block font-medium">Overall Fit Score</span>
-                                        <span class="text-2xl font-extrabold text-emerald-700">92%</span>
-                                    </div>
-                                    <div class="p-3.5 bg-brand-50 border border-brand-200 rounded-2xl">
-                                        <span class="text-neutral-500 block font-medium">AI Collaboration Quality</span>
-                                        <span class="text-2xl font-extrabold text-brand-700">Superior</span>
-                                    </div>
-                                </div>
-                                <div class="space-y-1 text-xs bg-neutral-50 p-3.5 rounded-xl border border-neutral-200">
-                                    <span class="font-bold text-neutral-900 block">Demonstrated Strengths:</span>
-                                    <p class="text-neutral-600 leading-relaxed">Formulated sharp concurrency questions to AI assistant, actively refactored generated logic, and wrote 100% passing tests.</p>
-                                </div>
-                                <div class="space-y-1 text-xs bg-neutral-50 p-3.5 rounded-xl border border-neutral-200">
-                                    <span class="font-bold text-neutral-900 block">Identified Growth Areas:</span>
-                                    <p class="text-neutral-600 leading-relaxed">Limited deep distributed lock caching under extreme multi-region replication scenarios.</p>
-                                </div>
-                            </div>
-                            <div class="md:col-span-6">
-                                <div class="chart-container" style="height:250px;">
-                                    <canvas id="candidateRadarChart"></canvas>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                setTimeout(initCandidateRadarChart, 60);
-            } else if (step === 5) {
-                // STEP 5: Decision & Comms
-                panel.innerHTML = `
-                    <div class="space-y-5">
-                        <div class="flex flex-wrap items-center justify-between border-b border-neutral-200 pb-4 gap-2">
-                            <div>
-                                <h3 class="font-bold text-neutral-900 text-lg">Step 5: One-Click Hiring Decision & Automated Communications</h3>
-                                <p class="text-xs text-neutral-500">Record final decisions and automatically draft personalized feedback emails tailored to session results.</p>
-                            </div>
-                            <div class="flex flex-wrap step5-actions gap-2 sm:space-x-2">
-                                <button onclick="setCandidateDecision('accepted')" class="custom-btn custom-btn-sm custom-btn-primary">
-                                    <span>Accept & Extend Offer</span>
-                                </button>
-                                <button onclick="setCandidateDecision('declined')" class="custom-btn custom-btn-sm custom-btn-ghost border border-rose-300 text-rose-700 hover:bg-rose-50">
-                                    <span>Decline with Feedback</span>
-                                </button>
-                            </div>
-                        </div>
-
-                        <div id="email-preview-container" class="bg-neutral-50 border border-neutral-200 p-5 rounded-2xl space-y-3">
-                            ${getEmailPreviewHtml(currentCandidateDecision)}
-                        </div>
-                    </div>
-                `;
-            }
-        }
-
-        function setWorkflowStep(step) {
-            renderWorkflowStep(step);
-        }
-
-
-
-        // Email Preview Template Generator
+        // Stage 05 Email Preview Template Generator
         function getEmailPreviewHtml(decision) {
             if (decision === 'accepted') {
                 return `
@@ -1713,11 +1690,11 @@
             } else {
                 return `
                     <div class="flex items-center justify-between text-xs text-neutral-500 border-b border-neutral-200 pb-2">
-                        <span class="font-semibold text-neutral-700">Automated Candidate Email Dispatch</span>
+                        <span class="font-semibold text-neutral-700">Automated Candidate Email Preview</span>
                         <span class="text-brand-600 font-mono">Select Accept or Decline above to preview email</span>
                     </div>
                     <div class="text-xs text-neutral-600 bg-white p-4 rounded-xl border border-neutral-200 leading-relaxed">
-                        Click <strong>"Accept & Extend Offer"</strong> or <strong>"Decline with Feedback"</strong> to generate the calibrated communication template.
+                        Click <strong>"Accept & Extend Offer"</strong> or <strong>"Decline with Feedback"</strong> to preview the personalized candidate email.
                     </div>
                 `;
             }
@@ -1725,7 +1702,21 @@
 
         function setCandidateDecision(decision) {
             currentCandidateDecision = decision;
-            document.getElementById('email-preview-container').innerHTML = getEmailPreviewHtml(decision);
+            const container = document.getElementById('email-preview-container');
+            if (container) {
+                container.innerHTML = getEmailPreviewHtml(decision);
+            }
+            const acceptBtn = document.getElementById('decision-accept-btn');
+            const declineBtn = document.getElementById('decision-decline-btn');
+            if (acceptBtn && declineBtn) {
+                if (decision === 'accepted') {
+                    acceptBtn.className = "custom-btn custom-btn-sm custom-btn-primary";
+                    declineBtn.className = "custom-btn custom-btn-sm custom-btn-ghost border border-rose-300 text-rose-700 hover:bg-rose-50";
+                } else if (decision === 'declined') {
+                    acceptBtn.className = "custom-btn custom-btn-sm custom-btn-ghost border border-neutral-300 text-neutral-700 hover:bg-neutral-50";
+                    declineBtn.className = "custom-btn custom-btn-sm bg-rose-600 text-white hover:bg-rose-700 border border-rose-600 shadow-sm";
+                }
+            }
         }
 
         function filterCandidates(type) {
@@ -1745,8 +1736,6 @@
             });
         }
 
-
-
         // Radar Chart for Candidate Assessment Step
         function initCandidateRadarChart() {
             const canvas = document.getElementById('candidateRadarChart');
@@ -1756,10 +1745,17 @@
                 candidateRadarChartInstance.destroy();
             }
 
+            const isSmallScreen = window.innerWidth < 480;
+
+            // Use two-line point labels on mobile so labels fit cleanly without clipping
+            const radarLabels = isSmallScreen 
+                ? [['Problem', 'Solving'], ['Code', 'Quality'], ['AI', 'Quality'], ['System', 'Design'], 'Communication']
+                : ['Problem Solving', 'Code Quality', 'AI Quality', 'System Design', 'Communication'];
+
             candidateRadarChartInstance = new Chart(canvas.getContext('2d'), {
                 type: 'radar',
                 data: {
-                    labels: ['Problem Solving', 'Code Hygiene', 'AI Quality', 'System Design', 'Communication'],
+                    labels: radarLabels,
                     datasets: [{
                         label: 'Sara Ali Evaluation',
                         data: [90, 88, 95, 76, 88],
@@ -1769,26 +1765,46 @@
                         pointBackgroundColor: '#2563eb',
                         pointBorderColor: '#ffffff',
                         pointBorderWidth: 2,
-                        pointRadius: 4
+                        pointRadius: isSmallScreen ? 3 : 4
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    layout: { padding: 10 },
+                    layout: { 
+                        padding: isSmallScreen ? 4 : 12 
+                    },
                     scales: {
                         r: {
                             min: 0,
                             max: 100,
-                            ticks: { display: false },
+                            ticks: { display: false, maxTicksLimit: 4 },
                             grid: { color: '#e2e8f0' },
+                            angleLines: { color: '#e2e8f0' },
                             pointLabels: {
-                                font: { family: 'Outfit', size: 11, weight: '600' },
+                                font: { 
+                                    family: 'Outfit', 
+                                    size: isSmallScreen ? 10 : 11, 
+                                    weight: '600' 
+                                },
                                 color: '#475569'
                             }
                         }
                     },
-                    plugins: { legend: { display: false } }
+                    plugins: { 
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                title: function(context) {
+                                    const fullTitles = ['Problem Solving', 'Code Quality', 'AI Quality', 'System Design', 'Communication'];
+                                    return fullTitles[context[0].dataIndex] || '';
+                                },
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.parsed.r + '%';
+                                }
+                            }
+                        }
+                    }
                 }
             });
         }
@@ -1823,6 +1839,8 @@
                 roiChartInstance.destroy();
             }
 
+            const isSmall = window.innerWidth < 480;
+
             roiChartInstance = new Chart(ctx, {
                 type: 'bar',
                 data: {
@@ -1850,12 +1868,15 @@
                     scales: {
                         y: {
                             beginAtZero: true,
-                            title: { display: true, text: 'Hours / Month', font: { family: 'Outfit', size: 12 } },
-                            grid: { color: '#f1f5f9' }
+                            title: { display: !isSmall, text: 'Hours / Month', font: { family: 'Outfit', size: 12 } },
+                            grid: { color: '#f1f5f9' },
+                            ticks: {
+                                font: { family: 'Outfit', size: isSmall ? 10 : 12 }
+                            }
                         },
                         x: {
                             grid: { display: false },
-                            ticks: { font: { family: 'Outfit', size: 12, weight: '600' } }
+                            ticks: { font: { family: 'Outfit', size: isSmall ? 11 : 12, weight: '600' } }
                         }
                     }
                 }
@@ -1986,7 +2007,7 @@
             }).filter(s => s.el !== null);
 
             function updateIndicator(activeLink) {
-                if (!activeLink) {
+                if (!activeLink || window.innerWidth < 768) {
                     indicator.style.opacity = '0';
                     return;
                 }
@@ -2000,9 +2021,13 @@
                 const navRect = nav.getBoundingClientRect();
                 const linkRect = activeLink.getBoundingClientRect();
 
-                indicator.style.left = `${linkRect.left - navRect.left}px`;
-                indicator.style.width = `${linkRect.width}px`;
-                indicator.style.opacity = '1';
+                if (navRect.width > 0 && linkRect.width > 0) {
+                    indicator.style.left = `${linkRect.left - navRect.left}px`;
+                    indicator.style.width = `${linkRect.width}px`;
+                    indicator.style.opacity = '1';
+                } else {
+                    indicator.style.opacity = '0';
+                }
             }
 
             function onScroll() {
@@ -2048,18 +2073,53 @@
 
             window.addEventListener('scroll', onScroll, { passive: true });
             window.addEventListener('resize', () => {
-                const activeLink = document.querySelector('.nav-section-link.text-brand-600');
-                if (activeLink) updateIndicator(activeLink);
+                if (window.innerWidth < 768) {
+                    indicator.style.opacity = '0';
+                } else {
+                    const activeLink = document.querySelector('.nav-section-link.text-brand-600');
+                    if (activeLink) updateIndicator(activeLink);
+                }
             }, { passive: true });
 
             // Run initial update
             setTimeout(onScroll, 80);
         }
 
+        // Debounced Resize Handler for responsive charts
+        let chartResizeTimer;
+        window.addEventListener('resize', () => {
+            clearTimeout(chartResizeTimer);
+            chartResizeTimer = setTimeout(() => {
+                initCandidateRadarChart();
+                calculateROI();
+                if (typeof currentDilemmaMode !== 'undefined') {
+                    updateDilemmaChart(currentDilemmaMode);
+                }
+            }, 250);
+        }, { passive: true });
+
+        // Close mobile drawer on escape key or clicking outside
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeMobileMenu();
+                closeModal();
+            }
+        });
+        document.addEventListener('click', (e) => {
+            const drawer = document.getElementById('mobile-nav-drawer');
+            const menuBtn = document.getElementById('mobile-menu-btn');
+            if (drawer && !drawer.classList.contains('hidden')) {
+                if (!drawer.contains(e.target) && !menuBtn.contains(e.target)) {
+                    closeMobileMenu();
+                }
+            }
+        });
+
         // Initialize on Window Load
         window.addEventListener('load', () => {
             setDilemmaMode('hirqo');
-            setWorkflowStep(0); // Start at HR Dashboard Overview
+            setCandidateDecision('accepted'); // Render default offer email preview
+            initCandidateRadarChart();
             calculateROI();
             initNavScrollspy();
         });
